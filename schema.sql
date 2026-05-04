@@ -106,3 +106,9 @@ CREATE POLICY "allow_all" ON actions FOR ALL USING (true);
 CREATE POLICY "allow_all" ON ai_responses FOR ALL USING (true);
 CREATE POLICY "allow_all" ON audit_logs FOR ALL USING (true);
 
+-- Indexes on foreign keys for faster joins.
+-- Important when cases table grows to 1000+ records.
+CREATE INDEX idx_actions_case_id ON actions(case_id);
+CREATE INDEX idx_ai_responses_case_id ON ai_responses(case_id);
+CREATE INDEX idx_audit_logs_record_id ON audit_logs(record_id);
+CREATE INDEX idx_audit_logs_table_name ON audit_logs(table_name);
