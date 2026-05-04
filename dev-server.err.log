@@ -1,0 +1,8 @@
+⨯ Another next dev server is already running.
+
+- Local:        http://localhost:3000
+- PID:          45552
+- Dir:          D:\Frontend (CCMS AI)\ccms-frontend
+- Log:          .next\dev\logs\next-development.log
+
+Run taskkill /PID 45552 /F to stop it.

@@ -1,68 +1,85 @@
 "use client";
 
+import {
+  BarChart3,
+  ClipboardCheck,
+  FileStack,
+  LayoutDashboard,
+  Scale,
+  ShieldCheck,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FaHome, FaFileAlt, FaBrain, FaChartBar } from "react-icons/fa";
+
+const menu = [
+  { name: "Dashboard", icon: LayoutDashboard, path: "/" },
+  { name: "Extraction", icon: FileStack, path: "/cases" },
+  { name: "Verification", icon: ClipboardCheck, path: "/review" },
+  { name: "Analytics", icon: BarChart3, path: "/analytics" },
+];
 
 export default function Sidebar() {
   const pathname = usePathname();
 
-  const menu = [
-    { name: "Dashboard", icon: <FaHome />, path: "/" },
-    { name: "Cases", icon: <FaFileAlt />, path: "/cases" },
-    { name: "Review", icon: <FaBrain />, path: "/review" },
-    { name: "Analytics", icon: <FaChartBar />, path: "/analytics" },
-  ];
-
   return (
-    <aside className="fixed left-0 top-0 z-20 flex h-full w-64 flex-col justify-between bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 px-6 py-8 text-white shadow-2xl">
-      <div>
-        <div className="mb-10">
-          <div className="inline-flex items-center rounded-full bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.28em] text-slate-200">
-            CCMS
+    <aside className="fixed inset-y-0 left-0 z-30 hidden w-72 border-r border-slate-200 bg-white text-slate-800 lg:flex lg:flex-col">
+      <div className="border-b border-slate-100 px-6 py-6">
+        <div className="flex items-center gap-3">
+          <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-teal-50 text-teal-700 border border-teal-100">
+            <Scale size={23} strokeWidth={2.5} />
           </div>
-          <h1 className="mt-6 text-3xl font-semibold tracking-tight text-white">
-            Control Center
-          </h1>
-          <p className="mt-2 text-sm leading-6 text-slate-300">
-            Manage cases, review intelligence, and stay on top of approvals.
-          </p>
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-teal-600">
+              CCMS AI
+            </p>
+            <h1 className="text-lg font-semibold tracking-tight text-slate-950">
+              Judgment Desk
+            </h1>
+          </div>
         </div>
-
-        <ul className="space-y-2">
-          {menu.map((item) => {
-            const active = pathname === item.path;
-            return (
-              <li key={item.name}>
-                <Link href={item.path} className="group block">
-                  <div
-                    className={`flex items-center gap-3 rounded-3xl px-4 py-3 text-sm font-medium transition ${
-                      active
-                        ? "bg-white/15 text-white shadow-lg shadow-slate-900/20"
-                        : "text-slate-300 hover:bg-white/10 hover:text-white"
-                    }`}
-                  >
-                    <span
-                      className={`inline-flex h-10 w-10 items-center justify-center rounded-2xl ${
-                        active ? "bg-slate-800 text-sky-400" : "bg-slate-800/80 text-slate-300"
-                      }`}
-                    >
-                      {item.icon}
-                    </span>
-                    {item.name}
-                  </div>
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
       </div>
 
-      <div className="rounded-3xl border border-white/10 bg-white/5 p-4 text-sm text-slate-300">
-        <p className="font-semibold text-white">Need help?</p>
-        <p className="mt-2 leading-6">
-          Reach out to support or check the docs for case review best practices.
+      <nav className="flex-1 px-4 py-5">
+        <p className="px-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
+          Workspace
         </p>
+        <div className="mt-3 space-y-1">
+          {menu.map((item) => {
+            const active = pathname === item.path;
+            const Icon = item.icon;
+
+            return (
+              <Link
+                key={item.name}
+                href={item.path}
+                className={`focus-ring flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium transition ${
+                  active
+                    ? "bg-slate-50 text-teal-700 border border-slate-200 shadow-sm"
+                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900 border border-transparent"
+                }`}
+              >
+                <Icon
+                  size={18}
+                  className={active ? "text-teal-700" : "text-slate-400"}
+                />
+                <span>{item.name}</span>
+              </Link>
+            );
+          })}
+        </div>
+      </nav>
+
+      <div className="border-t border-slate-100 p-4">
+        <div className="rounded-lg border border-teal-200 bg-teal-50 p-4">
+          <div className="flex items-center gap-2 text-sm font-semibold text-teal-800">
+            <ShieldCheck size={17} />
+            Verified Only
+          </div>
+          <p className="mt-2 text-sm leading-6 text-slate-600">
+            Dashboard records appear only after reviewer approval with source
+            evidence attached.
+          </p>
+        </div>
       </div>
     </aside>
   );
