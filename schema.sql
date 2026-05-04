@@ -105,4 +105,4 @@ CREATE POLICY "allow_all" ON cases FOR ALL USING (true);
 CREATE POLICY "allow_all" ON actions FOR ALL USING (true);
 CREATE POLICY "allow_all" ON ai_responses FOR ALL USING (true);
 CREATE POLICY "allow_all" ON audit_logs FOR ALL USING (true);
-Paste this in schema.sql and commit. Then tell me and I'll give you seed.sql next.Sonnet 4.6
+
