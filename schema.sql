@@ -77,3 +77,32 @@ CREATE TABLE audit_logs (
   comments TEXT,         -- optional reviewer notes
   created_at TIMESTAMPTZ DEFAULT now()
 );
+
+-- Auto updates updated_at timestamp on actions table
+-- whenever a reviewer edits or approves a record.
+CREATE OR REPLACE FUNCTION update_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = now();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER set_updated_at
+BEFORE UPDATE ON actions
+FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+
+
+-- Row Level Security enabled on all tables.
+-- Policies set to allow_all for hackathon demo.
+-- Should be locked down per user role in production.
+ALTER TABLE cases ENABLE ROW LEVEL SECURITY;
+ALTER TABLE actions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE ai_responses ENABLE ROW LEVEL SECURITY;
+ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "allow_all" ON cases FOR ALL USING (true);
+CREATE POLICY "allow_all" ON actions FOR ALL USING (true);
+CREATE POLICY "allow_all" ON ai_responses FOR ALL USING (true);
+CREATE POLICY "allow_all" ON audit_logs FOR ALL USING (true);
+Paste this in schema.sql and commit. Then tell me and I'll give you seed.sql next.Sonnet 4.6
