@@ -5,10 +5,12 @@ import MainLayout from "../layouts/MainLayout";
 import { UploadCloud } from "lucide-react";
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { useTranslation } from "../hooks/useTranslation";
 
 export default function ExtractionPage() {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadSuccess, setUploadSuccess] = useState(false);
+  const { t } = useTranslation();
 
   const handleUpload = () => {
     setIsUploading(true);
@@ -24,10 +26,10 @@ export default function ExtractionPage() {
       <div className="space-y-6">
         <div className="flex flex-col gap-2">
           <h1 className="text-3xl font-bold tracking-tight text-slate-900">
-            Extraction Queue
+            {t("extraction.title" as any)}
           </h1>
           <p className="text-sm text-slate-600">
-            Upload new judgments to extract actionable directives.
+            {t("extraction.subtitle" as any)}
           </p>
         </div>
 
@@ -41,12 +43,12 @@ export default function ExtractionPage() {
               <UploadCloud size={28} />
             </div>
             <h2 className="text-lg font-bold text-slate-900 mb-2">
-              {uploadSuccess ? "Extraction Complete" : "Drop judgment PDF here"}
+              {uploadSuccess ? t("extraction.complete" as any) : t("extraction.drop" as any)}
             </h2>
             <p className="text-sm text-slate-500 mb-6">
               {uploadSuccess 
-                ? "The document has been successfully processed and added to the verification queue." 
-                : "The system will automatically extract key directives, responsible offices, and generate an action plan."}
+                ? t("extraction.success_desc" as any)
+                : t("extraction.default_desc" as any)}
             </p>
             
             <div className="relative w-48">
@@ -65,7 +67,7 @@ export default function ExtractionPage() {
                 uploadSuccess ? 'bg-emerald-600 text-white' : 
                 'bg-slate-900 text-white hover:bg-slate-800'
               }`}>
-                {isUploading ? "Extracting..." : uploadSuccess ? "Success!" : "Select PDF"}
+                {isUploading ? t("cases.extracting" as any) : uploadSuccess ? t("cases.success" as any) : t("cases.select_pdf" as any)}
               </div>
             </div>
           </div>

@@ -5,10 +5,11 @@ import {
   type CaseRisk,
   type ReviewStatus,
 } from "@/app/lib/ccms-data";
-import { ArrowRight, Filter, Search } from "lucide-react";
+import { ArrowRight, Filter, Search, FileQuestion, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+import { useTranslation } from "../hooks/useTranslation";
 
 const statusTabs: Array<"All" | ReviewStatus> = [
   "All",
@@ -36,6 +37,7 @@ export default function CaseTable() {
   const [activeStatus, setActiveStatus] =
     useState<(typeof statusTabs)[number]>("All");
   const [query, setQuery] = useState("");
+  const { t } = useTranslation();
 
   const filteredCases = useMemo(() => {
     return judgmentCases.filter((item) => {
@@ -63,11 +65,11 @@ export default function CaseTable() {
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex items-center gap-4">
             <h2 className="text-lg font-bold text-slate-900">
-              Extraction Records
+              {t("case_table.title" as any)}
             </h2>
             <div className="flex items-center gap-2 rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-600">
               <Filter size={14} />
-              {filteredCases.length} items
+              {filteredCases.length} {t("case_table.items" as any)}
             </div>
           </div>
 
@@ -78,8 +80,17 @@ export default function CaseTable() {
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 className="w-full bg-transparent text-sm outline-none placeholder:text-slate-400 sm:w-64"
-                placeholder="Search case, department..."
+                placeholder={t("case_table.search" as any)}
               />
+              {query && (
+                <button 
+                  onClick={() => setQuery("")}
+                  className="text-slate-400 hover:text-slate-600 transition"
+                  aria-label="Clear search"
+                >
+                  <X size={14} />
+                </button>
+              )}
             </label>
           </div>
         </div>
@@ -109,10 +120,10 @@ export default function CaseTable() {
         <table className="min-w-full text-left text-sm">
           <thead className="border-b border-slate-100 bg-slate-50/50 text-xs uppercase tracking-wider text-slate-500 font-semibold">
             <tr>
-              <th className="px-6 py-4">Case</th>
-              <th className="px-6 py-4">Department & Parties</th>
-              <th className="px-6 py-4">Action Summary</th>
-              <th className="px-6 py-4">Status</th>
+              <th className="px-6 py-4">{t("case_table.headers.case" as any)}</th>
+              <th className="px-6 py-4">{t("case_table.headers.dept_parties" as any)}</th>
+              <th className="px-6 py-4">{t("case_table.headers.action_summary" as any)}</th>
+              <th className="px-6 py-4">{t("case_table.headers.status" as any)}</th>
               <th className="px-6 py-4"></th>
             </tr>
           </thead>
@@ -152,7 +163,7 @@ export default function CaseTable() {
                     {item.reviewStatus}
                   </span>
                   <p className="mt-2 text-xs font-semibold text-slate-400">
-                    {item.confidence}% confidence
+                    {item.confidence}% {t("case_table.confidence" as any)}
                   </p>
                 </td>
                 <td className="px-6 py-4 align-top text-right">
@@ -160,7 +171,7 @@ export default function CaseTable() {
                     onClick={() => router.push(`/review?id=${item.id}`)}
                     className="focus-ring inline-flex items-center gap-1.5 rounded-lg bg-slate-50 px-3 py-2 text-xs font-bold text-slate-700 transition group-hover:bg-teal-50 group-hover:text-teal-700"
                   >
-                    Verify
+                    {t("case_table.verify" as any)}
                     <ArrowRight size={14} />
                   </button>
                 </td>
@@ -168,8 +179,24 @@ export default function CaseTable() {
             ))}
             {filteredCases.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-6 py-12 text-center text-slate-500">
-                  No cases found matching your criteria.
+                <td colSpan={5} className="px-6 py-16 text-center">
+                  <div className="flex flex-col items-center justify-center text-slate-500">
+                    <div className="bg-slate-100 p-3 rounded-full mb-3 text-slate-400">
+                      <FileQuestion size={24} />
+                    </div>
+                    <p className="text-sm font-semibold text-slate-700 mb-1">{t("case_table.no_matches" as any)}</p>
+                    <p className="text-xs text-slate-500 max-w-sm">
+                      {t("case_table.no_matches_desc" as any)} "{query}". {t("case_table.try_adjusting" as any)}
+                    </p>
+                    {query && (
+                      <button 
+                        onClick={() => setQuery("")}
+                        className="mt-4 px-4 py-2 bg-white border border-slate-200 rounded-md text-xs font-semibold text-slate-700 hover:bg-slate-50 transition shadow-sm"
+                      >
+                        {t("case_table.clear_search" as any)}
+                      </button>
+                    )}
+                  </div>
                 </td>
               </tr>
             )}
