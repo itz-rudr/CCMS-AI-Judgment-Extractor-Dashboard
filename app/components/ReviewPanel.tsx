@@ -20,6 +20,7 @@ import { useSearchParams } from "next/navigation";
 import { useMemo, useState } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import { motion } from "framer-motion";
+import { useTranslation } from "../hooks/useTranslation";
 
 pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
 
@@ -74,6 +75,7 @@ function FieldInput({
 export default function ReviewPanel() {
   const searchParams = useSearchParams();
   const requestedId = searchParams.get("id");
+  const { t } = useTranslation();
 
   const caseRecord = useMemo(() => {
     return (
@@ -85,6 +87,7 @@ export default function ReviewPanel() {
 }
 
 function ReviewWorkspace({ caseRecord }: { caseRecord: JudgmentCase }) {
+  const { t } = useTranslation();
   const [numPages, setNumPages] = useState<number | null>(null);
   const [pageNumber, setPageNumber] = useState(caseRecord.highlights[0].page);
   const [selectedHighlight, setSelectedHighlight] = useState<SourceHighlight>(
@@ -118,9 +121,9 @@ function ReviewWorkspace({ caseRecord }: { caseRecord: JudgmentCase }) {
       <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between pb-2 border-b border-slate-200">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-slate-900 flex items-center gap-3">
-            Verification: {caseRecord.id}
-            <span className={`text-xs px-2.5 py-1 rounded-full font-bold uppercase tracking-wider border ${statusClass[decision]}`}>
-              {decision}
+            {caseRecord.title}
+            <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700 border border-blue-200">
+              {t("review_panel.confidence" as any)}: {caseRecord.confidence}%
             </span>
           </h1>
           <p className="mt-1 text-sm text-slate-500 font-medium">
@@ -128,8 +131,8 @@ function ReviewWorkspace({ caseRecord }: { caseRecord: JudgmentCase }) {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <span className="rounded-full bg-slate-900 px-3 py-1 text-xs font-bold text-white">
-            {caseRecord.confidence}% AI Confidence
+          <span className="rounded-full bg-slate-800 px-3 py-1 text-xs font-bold text-white border border-slate-700">
+            {caseRecord.confidence}% {t("review_panel.ai_confidence" as any)}
           </span>
         </div>
       </div>
@@ -142,7 +145,7 @@ function ReviewWorkspace({ caseRecord }: { caseRecord: JudgmentCase }) {
             <div className="flex items-center justify-between bg-slate-50 px-4 py-3 border-b border-slate-100">
               <div className="flex items-center gap-2 text-sm font-bold text-slate-700">
                 <FileText size={16} className="text-teal-600" />
-                Source Document
+                {t("review_panel.source_doc" as any)}
               </div>
               <div className="flex items-center gap-3 text-sm font-semibold">
                 <button
@@ -213,7 +216,7 @@ function ReviewWorkspace({ caseRecord }: { caseRecord: JudgmentCase }) {
           <div className="panel rounded-xl bg-white border border-slate-200 shadow-sm p-4">
              <div className="flex items-center gap-2 text-sm font-bold text-slate-700 mb-3">
                 <Highlighter size={16} className="text-amber-500" />
-                Extracted Evidence
+                {t("review_panel.extracted_evidence" as any)}
               </div>
               <div className="flex gap-3 overflow-x-auto pb-2">
                 {caseRecord.highlights.map((highlight) => {
@@ -247,7 +250,7 @@ function ReviewWorkspace({ caseRecord }: { caseRecord: JudgmentCase }) {
           <div className="panel rounded-xl bg-white border border-slate-200 shadow-sm p-5 flex-1">
             <div className="flex items-center gap-2 text-sm font-bold text-slate-700 border-b border-slate-100 pb-3 mb-4">
               <Pencil size={16} className="text-teal-600" />
-              Verified Data Fields
+              {t("review_panel.verified_data" as any)}
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
@@ -339,21 +342,21 @@ function ReviewWorkspace({ caseRecord }: { caseRecord: JudgmentCase }) {
                 className="focus-ring inline-flex items-center justify-center gap-2 rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-emerald-600"
               >
                 <CheckCircle2 size={16} />
-                Approve
+                {t("review_panel.buttons.approve" as any)}
               </button>
               <button
                 onClick={() => setDecision("Edited")}
                 className="focus-ring inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-bold text-slate-700 transition hover:bg-slate-100"
               >
                 <Pencil size={16} />
-                Edit
+                {t("review_panel.buttons.save" as any)}
               </button>
               <button
                 onClick={() => setDecision("Rejected")}
                 className="focus-ring inline-flex items-center justify-center gap-2 rounded-lg border border-rose-200 bg-white px-4 py-2.5 text-sm font-bold text-rose-600 transition hover:bg-rose-50"
               >
                 <XCircle size={16} />
-                Reject
+                {t("review_panel.buttons.reject" as any)}
               </button>
             </div>
           </div>

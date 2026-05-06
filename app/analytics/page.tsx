@@ -4,6 +4,7 @@ import { departmentSummary, pipelineSteps, reviewerQueue } from "../lib/ccms-dat
 import MainLayout from "../layouts/MainLayout";
 import { motion, Variants } from "framer-motion";
 import { Activity, LayoutGrid, Users } from "lucide-react";
+import { useTranslation } from "../hooks/useTranslation";
 
 const container: Variants = {
   hidden: { opacity: 0 },
@@ -19,15 +20,16 @@ const item: Variants = {
 };
 
 export default function AnalyticsPage() {
+  const { t } = useTranslation();
   return (
     <MainLayout>
       <div className="space-y-6">
         <div className="flex flex-col gap-2">
           <h1 className="text-3xl font-bold tracking-tight text-slate-900">
-            System Analytics
+            {t("analytics.title" as any)}
           </h1>
           <p className="text-sm text-slate-600">
-            Monitor processing pipelines, team workload, and departmental compliance.
+            {t("analytics.subtitle" as any)}
           </p>
         </div>
 
@@ -39,9 +41,9 @@ export default function AnalyticsPage() {
         >
           {/* Pipeline Overview */}
           <motion.div variants={item} className="space-y-4">
-            <div className="flex items-center gap-2 text-sm font-bold text-slate-700">
-              <Activity size={18} className="text-teal-600" />
-              Processing Pipeline Overview
+            <div className="flex items-center gap-2 text-sm font-bold text-slate-900">
+              <Activity size={18} className="text-blue-500" />
+              {t("analytics.pipeline" as any)}
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {pipelineSteps.map((step, idx) => {
@@ -49,7 +51,7 @@ export default function AnalyticsPage() {
                 return (
                   <div key={idx} className="panel rounded-xl bg-white border border-slate-200 p-5 shadow-sm hover:shadow-md transition">
                     <div className="flex items-start justify-between">
-                      <div className="p-2 rounded-lg bg-teal-50 text-teal-600">
+                      <div className="p-2 rounded-lg bg-blue-500 text-white">
                         <Icon size={20} />
                       </div>
                       <h3 className="text-2xl font-bold text-slate-900">{step.count}</h3>
@@ -64,9 +66,9 @@ export default function AnalyticsPage() {
 
           {/* Reviewer Queue */}
           <motion.div variants={item} className="space-y-4 flex flex-col h-full">
-            <div className="flex items-center gap-2 text-sm font-bold text-slate-700 shrink-0">
-              <Users size={18} className="text-amber-600" />
-              Reviewer Workload
+            <div className="flex items-center gap-2 text-sm font-bold text-slate-900 shrink-0">
+              <Users size={18} className="text-amber-400" />
+              {t("analytics.workload" as any)}
             </div>
             <div className="panel rounded-xl bg-white border border-slate-200 overflow-hidden shadow-sm flex-1 flex flex-col">
               <div className="divide-y divide-slate-100 flex-1 flex flex-col">
@@ -95,9 +97,9 @@ export default function AnalyticsPage() {
 
           {/* Departmental Compliance */}
           <motion.div variants={item} className="lg:col-span-2 space-y-4 mt-2">
-            <div className="flex items-center gap-2 text-sm font-bold text-slate-700">
-              <LayoutGrid size={18} className="text-blue-600" />
-              Departmental Compliance Summary
+            <div className="flex items-center gap-2 text-sm font-bold text-slate-900">
+              <LayoutGrid size={18} className="text-blue-400" />
+              {t("analytics.dept_compliance" as any)}
             </div>
             <div className="panel rounded-xl overflow-hidden bg-white border border-slate-200 shadow-sm">
               <div className="overflow-x-auto">
