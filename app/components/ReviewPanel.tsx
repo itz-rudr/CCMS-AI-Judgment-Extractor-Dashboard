@@ -1,69 +1,102 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
+import {
+  CalendarClock,
+  CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
+  FileText,
+  Highlighter,
+  Pencil,
+  ShieldAlert,
+  XCircle,
+} from "lucide-react";
+import { useSearchParams } from "next/navigation";
 import { Document, Page, pdfjs } from "react-pdf";
+import { motion } from "framer-motion";
+import { useTranslation } from "../hooks/useTranslation";
 
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
+
+const ORIGINAL_WIDTH = 860;
+const PAGE_WIDTH = 620;
 
 export default function ReviewPanel() {
-  const ORIGINAL_WIDTH = 1000;
+  const searchParams = useSearchParams();
+  const requestedId = searchParams.get("id");
+  return <ReviewWorkspace key={requestedId || "new"} requestedId={requestedId} />;
+}
+
+function ReviewWorkspace({ requestedId }: { requestedId: string | null }) {
+  const { t } = useTranslation();
   const [numPages, setNumPages] = useState<number | null>(null);
   const [pageNumber, setPageNumber] = useState(1);
-  const [pageWidth, setPageWidth] = useState(600);
-  const scale = pageWidth / ORIGINAL_WIDTH;
-
-  const [actions, setActions] = useState<any[]>([]);
   const [role, setRole] = useState("officer");
+  
+  const [actions, setActions] = useState<any[]>([]);
+  const [selectedHighlightId, setSelectedHighlightId] = useState<string | null>(null);
+  
+  const pdfFile = useMemo(() => ({ url: "/sample.pdf" }), []);
+  const safePageNumber = numPages ? Math.min(pageNumber, numPages) : pageNumber;
+  const scale = PAGE_WIDTH / ORIGINAL_WIDTH;
 
   useEffect(() => {
     async function fetchActions() {
       try {
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
-        const casesRes = await fetch(`${apiUrl}/api/cases`);
-        const casesData = await casesRes.json();
+        // If requestedId exists, we fetch for that case.
+        // Otherwise fallback to first case.
+        let targetId = requestedId;
+        if (!targetId) {
+            const casesRes = await fetch(`${apiUrl}/api/cases`);
+            const casesData = await casesRes.json();
+            if (casesData && casesData.length > 0) {
+              targetId = casesData[0].id;
+            }
+        }
         
-        if (casesData && casesData.length > 0) {
-          const caseId = casesData[0].id;
-          const actionsRes = await fetch(`${apiUrl}/api/cases/${caseId}/actions?role=${role}`);
+        if (targetId) {
+          const actionsRes = await fetch(`${apiUrl}/api/cases/${targetId}/actions?role=${role}`);
           const actionsData = await actionsRes.json();
           setActions(actionsData);
+          if (actionsData.length > 0) {
+              setSelectedHighlightId(actionsData[0].id);
+              if (actionsData[0].bbox_page) {
+                  setPageNumber(actionsData[0].bbox_page);
+              }
+          }
         }
       } catch (err) {
         console.error("Failed to fetch actions:", err);
       }
     }
     fetchActions();
-  }, [role]);
+  }, [requestedId, role]);
 
-  const firstAction = actions.length > 0 ? actions[0] : null;
-  const bbox = firstAction?.bounding_box ? {
-    page: firstAction.bbox_page || 1,
-    x: firstAction.bounding_box[0],
-    y: firstAction.bounding_box[1],
-    width: firstAction.bounding_box[2] - firstAction.bounding_box[0],
-    height: firstAction.bounding_box[3] - firstAction.bounding_box[1],
+  const selectedAction = actions.find(a => a.id === selectedHighlightId) || actions[0] || null;
+  const bbox = selectedAction?.bounding_box ? {
+    page: selectedAction.bbox_page || 1,
+    x: selectedAction.bounding_box[0],
+    y: selectedAction.bounding_box[1],
+    width: selectedAction.bounding_box[2] - selectedAction.bounding_box[0],
+    height: selectedAction.bounding_box[3] - selectedAction.bounding_box[1],
   } : null;
 
-  const onDocumentLoadSuccess = ({ numPages }: any) => {
-    setNumPages(numPages);
-  };
-
   return (
-    <div className="flex h-[80vh] flex-col gap-6 lg:flex-row">
-      <div className="w-full rounded-3xl border border-slate-200 bg-white p-4 shadow-lg lg:w-1/2">
-        <div className="flex flex-col gap-3 border-b border-slate-200 pb-4">
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Document preview</p>
-              <h2 className="mt-2 text-2xl font-semibold text-slate-900">Sample PDF Review</h2>
-            </div>
-            <div className="rounded-full bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700">
-              Page {pageNumber}
-            </div>
-          </div>
-          <p className="text-sm text-slate-500">
-            Use the controls below to review pages and inspect highlighted content.
-          </p>
+    <motion.div 
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="space-y-6"
+    >
+      <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between pb-2 border-b border-slate-200">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 flex items-center gap-3">
+            Case Review: {requestedId || "Default"}
+            <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700 border border-blue-200">
+              {t("review_panel.confidence" as any) || "Confidence"}: {selectedAction ? Math.round((selectedAction.confidence_score || 0)*100) : 0}%
+            </span>
+          </h1>
           <div className="flex items-center gap-2 mt-2">
             <span className="text-sm text-slate-500">View as:</span>
             <select 
@@ -76,87 +109,151 @@ export default function ReviewPanel() {
             </select>
           </div>
         </div>
-
-        <div className="relative mt-4 overflow-hidden rounded-3xl bg-slate-50 p-4">
-          <Document file="/sample.pdf" onLoadSuccess={onDocumentLoadSuccess}>
-            <Page pageNumber={pageNumber} width={pageWidth} />
-          </Document>
-
-          {bbox && pageNumber === bbox.page && (
-            <div
-              className="pointer-events-none absolute border-2 border-red-500 bg-red-500/15"
-              style={{
-                top: bbox.y * scale,
-                left: bbox.x * scale,
-                width: bbox.width * scale,
-                height: bbox.height * scale,
-              }}
-            />
-          )}
-        </div>
-
-        <div className="mt-4 flex items-center justify-between rounded-3xl bg-slate-100 px-4 py-3">
-          <button
-            onClick={() => setPageNumber((p) => Math.max(p - 1, 1))}
-            className="rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
-          >
-            Prev
-          </button>
-          <p className="text-sm text-slate-600">
-            Page {pageNumber} of {numPages || "..."}
-          </p>
-          <button
-            onClick={() =>
-              setPageNumber((p) =>
-                numPages ? Math.min(p + 1, numPages) : p
-              )
-            }
-            className="rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
-          >
-            Next
-          </button>
-        </div>
       </div>
 
-      <div className="w-full rounded-3xl bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 p-6 text-white shadow-lg lg:w-1/2">
-        <div className="flex items-center justify-between gap-4 border-b border-white/10 pb-4">
-          <div>
-            <p className="text-xs uppercase tracking-[0.24em] text-slate-400">AI Data Panel</p>
-            <h2 className="mt-2 text-2xl font-semibold">Insights & Actions</h2>
-          </div>
-          <span className="rounded-full bg-emerald-500/20 text-emerald-400 px-3 py-1 text-sm border border-emerald-500/30">
-            Connected to API
-          </span>
-        </div>
-
-        <p className="mt-4 text-sm text-slate-300">
-          View model recommendations, highlight assessment, and next-step proposals without leaving the review workspace.
-        </p>
-
-        <div className="mt-6 grid gap-4">
-          {actions.length === 0 ? (
-             <p className="text-sm text-slate-400 italic">No actions found for this case.</p>
-          ) : actions.map((act) => (
-            <div key={act.id} className="rounded-3xl bg-white/5 p-4 border border-white/10">
-              <div className="flex justify-between items-start">
-                <p className="text-xs uppercase tracking-[0.24em] text-sky-400">{act.department}</p>
-                <span className={`text-xs px-2 py-1 rounded-full ${act.priority === 'high' ? 'bg-red-500/20 text-red-400' : 'bg-yellow-500/20 text-yellow-400'}`}>
-                  {act.priority} priority
-                </span>
+      <div className="grid grid-cols-1 gap-6 2xl:grid-cols-[minmax(0,1.1fr)_minmax(460px,0.9fr)]">
+        
+        {/* Left Side: Document Viewer & Evidence */}
+        <section className="flex flex-col gap-4">
+          <div className="panel rounded-xl overflow-hidden bg-white border border-slate-200 shadow-sm flex flex-col h-full">
+            <div className="flex items-center justify-between bg-slate-50 px-4 py-3 border-b border-slate-100">
+              <div className="flex items-center gap-2 text-sm font-bold text-slate-700">
+                <FileText size={16} className="text-teal-600" />
+                {t("review_panel.source_doc" as any) || "Source Document"}
               </div>
-              <p className="mt-2 text-lg font-semibold text-white">{act.action_required}</p>
-              <p className="mt-2 text-sm leading-6 text-slate-300">
-                Deadline: {act.deadline} • Confidence: {Math.round((act.confidence_score || 0) * 100)}%
-              </p>
-              {act.source_text_quote && (
-                <blockquote className="mt-3 border-l-2 border-slate-600 pl-3 text-sm italic text-slate-400">
-                  "{act.source_text_quote}"
-                </blockquote>
-              )}
+              <div className="flex items-center gap-3 text-sm font-semibold">
+                <button
+                  onClick={() => setPageNumber((page) => Math.max(page - 1, 1))}
+                  className="p-1 rounded-md hover:bg-slate-200 text-slate-500 transition"
+                >
+                  <ChevronLeft size={16} />
+                </button>
+                <span className="text-slate-600 w-16 text-center">
+                  {safePageNumber} / {numPages ?? "--"}
+                </span>
+                <button
+                  onClick={() =>
+                    setPageNumber((page) =>
+                      numPages ? Math.min(page + 1, numPages) : page + 1
+                    )
+                  }
+                  className="p-1 rounded-md hover:bg-slate-200 text-slate-500 transition"
+                >
+                  <ChevronRight size={16} />
+                </button>
+              </div>
             </div>
-          ))}
-        </div>
+
+            <div className="bg-slate-100 p-4 flex-1 flex justify-center items-start overflow-auto">
+              <div className="relative shadow-lg rounded-md bg-white border border-slate-200" style={{ width: PAGE_WIDTH }}>
+                <Document
+                  file={pdfFile}
+                  onLoadSuccess={({ numPages }: { numPages: number }) =>
+                    setNumPages(numPages)
+                  }
+                  loading={
+                    <div className="flex h-[620px] items-center justify-center text-sm font-bold text-slate-400">
+                      Loading PDF...
+                    </div>
+                  }
+                  error={
+                    <div className="flex h-[620px] flex-col items-center justify-center text-center text-sm text-rose-500 bg-rose-50/50">
+                      <ShieldAlert size={28} className="mb-2" />
+                      <p className="font-bold">Cannot load PDF</p>
+                    </div>
+                  }
+                >
+                  <Page
+                    pageNumber={safePageNumber}
+                    width={PAGE_WIDTH}
+                    renderAnnotationLayer={false}
+                    renderTextLayer={false}
+                  />
+                </Document>
+
+                {bbox && bbox.page === safePageNumber && (
+                  <div
+                    className="absolute rounded-md border-2 border-amber-400 bg-amber-400/20 shadow-[0_0_0_9999px_rgba(255,255,255,0.6)]"
+                    style={{
+                      top: bbox.y * scale,
+                      left: bbox.x * scale,
+                      width: bbox.width * scale,
+                      height: bbox.height * scale,
+                    }}
+                  />
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Evidence Map Minimal */}
+          <div className="panel rounded-xl bg-white border border-slate-200 shadow-sm p-4">
+             <div className="flex items-center gap-2 text-sm font-bold text-slate-700 mb-3">
+                <Highlighter size={16} className="text-amber-500" />
+                {t("review_panel.extracted_evidence" as any) || "Extracted Evidence"}
+              </div>
+              <div className="flex gap-3 overflow-x-auto pb-2">
+                {actions.map((act) => {
+                  const selected = selectedHighlightId === act.id;
+                  return (
+                    <button
+                      key={act.id}
+                      onClick={() => {
+                          setSelectedHighlightId(act.id);
+                          if(act.bbox_page) setPageNumber(act.bbox_page);
+                      }}
+                      className={`focus-ring shrink-0 w-64 rounded-lg border p-3 text-left transition ${
+                        selected
+                          ? "border-amber-400 bg-amber-50 shadow-sm"
+                          : "border-slate-200 bg-slate-50 hover:bg-white"
+                      }`}
+                    >
+                      <div className="flex justify-between items-center mb-1">
+                        <p className="text-xs font-bold text-slate-900">{act.department}</p>
+                        <span className="text-[10px] font-bold text-slate-500 bg-white px-1.5 py-0.5 rounded border border-slate-200">
+                          p.{act.bbox_page || 1}
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-600 line-clamp-2">"{act.source_text_quote || "No quote"}"</p>
+                    </button>
+                  );
+                })}
+              </div>
+          </div>
+        </section>
+
+        {/* Right Side: AI Actions */}
+        <section className="space-y-4 flex flex-col h-full">
+          <div className="panel rounded-xl bg-white border border-slate-200 shadow-sm p-5 flex-1">
+            
+            <div className="mt-6 pt-4 border-t border-slate-100">
+               <div className="flex items-center gap-2 text-sm font-bold text-slate-700 mb-3">
+                <CalendarClock size={16} className="text-blue-600" />
+                Proposed Action Plan
+              </div>
+              <div className="space-y-4">
+                {actions.length === 0 ? (
+                  <p className="text-sm text-slate-400 italic">No actions found for this case.</p>
+                ) : actions.map((act) => (
+                  <div key={act.id} className="rounded-xl bg-slate-50 p-4 border border-slate-200">
+                    <div className="flex justify-between items-start">
+                      <p className="text-xs font-bold text-slate-700">{act.department}</p>
+                      <span className={`text-xs px-2 py-1 rounded-full ${act.priority === 'high' ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-amber-50 text-amber-700 border border-amber-200'}`}>
+                        {act.priority} priority
+                      </span>
+                    </div>
+                    <p className="mt-2 text-sm font-semibold text-slate-900">{act.action_required}</p>
+                    <p className="mt-2 text-xs text-slate-500">
+                      Deadline: {act.deadline}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+        </section>
       </div>
-    </div>
+    </motion.div>
   );
 }
