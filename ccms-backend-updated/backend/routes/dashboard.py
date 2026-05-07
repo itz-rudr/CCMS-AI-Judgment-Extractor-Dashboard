@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException, status
 from typing import List, Dict, Any
 from backend.db import get_supabase
 from backend.services.formatter import format_case
+from backend.repositories.cases import IN_MEMORY_CASES
 
 dashboard_router = APIRouter()
 analytics_router = APIRouter()
@@ -36,7 +37,14 @@ async def get_analytics():
     try:
         db = get_supabase()
         actions_res = db.table("actions").select("status, department").execute()
-        actions = actions_res.data
+        db_actions = actions_res.data
+        
+        # Merge in-memory actions for real-time analytics
+        mem_actions = []
+        for c in IN_MEMORY_CASES:
+            mem_actions.extend(c.get("actions", []))
+            
+        actions = db_actions + mem_actions
         
         pending_count = sum(1 for a in actions if a.get("status") == "pending")
         approved_count = sum(1 for a in actions if a.get("status") == "approved")
@@ -46,7 +54,7 @@ async def get_analytics():
         # Dept summary
         dept_counts = {}
         for a in actions:
-            dept = a.get("department", "Unknown")
+            dept = a.get("department") or "Unknown"
             if dept not in dept_counts:
                 dept_counts[dept] = {"name": dept, "compliance": 0, "pending": 0, "overdue": 0}
             if a.get("status") == "approved":

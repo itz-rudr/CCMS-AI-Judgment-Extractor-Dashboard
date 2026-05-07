@@ -50,10 +50,11 @@ def format_case(case_data: dict) -> dict:
     
     return {
         "id": case_data.get("id"),
+        "caseNumber": case_data.get("case_number", "Unknown"),
         "cisId": case_data.get("case_number", "Unknown"),
         "title": case_data.get("parties_involved", "Unknown"),
         "bench": case_data.get("judge_name", "Unknown Bench"),
-        "department": actions[0].get("department", "Multiple") if len(actions) == 1 else "Multiple",
+        "department": actions[0].get("department", "Revenue Department") if actions else "Multiple",
         "nodalOfficer": "Unassigned",
         "orderDate": str(case_data.get("created_at", ""))[:10],
         "ingestionTime": str(case_data.get("created_at", "")),

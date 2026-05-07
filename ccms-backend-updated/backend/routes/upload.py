@@ -31,6 +31,7 @@ async def process_document(job_id: str, file_path: str, language: str = "English
         JOBS[job_id].status = "Analyzing with AI..."
         JOBS[job_id].progress = 50
         
+        # --- AI Extractor Call ---
         from backend.services.ai_extractor import chunk_and_extract
         logger.info(f"Extracting with output_language={language}")
         extracted_case = await chunk_and_extract(text, output_language=language)
@@ -42,6 +43,9 @@ async def process_document(job_id: str, file_path: str, language: str = "English
         db = get_supabase()
         
         # 1. Insert Case (Best effort storage)
+        # Use the relative static URL for the frontend
+        public_pdf_url = f"/static/pdfs/{os.path.basename(file_path)}"
+        
         case_data = {
             "case_number": extracted_case.case_number,
             "parties_involved": extracted_case.parties_involved,
@@ -49,7 +53,7 @@ async def process_document(job_id: str, file_path: str, language: str = "English
             "next_hearing_date": extracted_case.next_hearing_date,
             "legal_sections": extracted_case.legal_sections,
             "summary": extracted_case.summary,
-            "pdf_url": file_path
+            "pdf_url": public_pdf_url
         }
         
         case_id = None
@@ -78,8 +82,8 @@ async def process_document(job_id: str, file_path: str, language: str = "English
             logger.error(f"DATABASE PERSISTENCE FAILED (Job {job_id}): {db_err}")
             # SAVE TO MEMORY FALLBACK
             import uuid
-            mem_id = f"mem_{uuid.uuid4().hex[:8]}"
-            case_data["id"] = mem_id
+            case_id = f"mem_{uuid.uuid4().hex[:8]}"
+            case_data["id"] = case_id
             case_data["created_at"] = datetime.datetime.now().isoformat()
             
             # Format actions for memory
@@ -88,7 +92,7 @@ async def process_document(job_id: str, file_path: str, language: str = "English
                 for action in extracted_case.actions:
                     mem_actions.append({
                         "id": f"act_{uuid.uuid4().hex[:6]}",
-                        "case_id": mem_id,
+                        "case_id": case_id,
                         "department": action.department,
                         "action_required": action.action_required,
                         "deadline": action.deadline,
@@ -98,9 +102,10 @@ async def process_document(job_id: str, file_path: str, language: str = "English
                     })
             case_data["actions"] = mem_actions
             IN_MEMORY_CASES.insert(0, case_data)
-            logger.info(f"Case {case_data['case_number']} saved to IN_MEMORY_STORE.")
+            logger.info(f"Case {case_data['case_number']} saved to IN_MEMORY_STORE with ID {case_id}.")
         
-        JOBS[job_id].status = "Done" if case_id else "Done (Session Storage)"
+        JOBS[job_id].status = "Done" if not case_id.startswith("mem_") else "Done (Session Storage)"
+        JOBS[job_id].case_id = case_id
         JOBS[job_id].progress = 100
         JOBS[job_id].result = extracted_case.model_dump()
         
@@ -108,12 +113,9 @@ async def process_document(job_id: str, file_path: str, language: str = "English
         logger.error(f"Error processing document for job {job_id}: {e}")
         JOBS[job_id].status = f"Failed: {str(e)}"
     finally:
-        # Clean up temporary file
-        if os.path.exists(file_path):
-            try:
-                os.remove(file_path)
-            except Exception as cleanup_error:
-                logger.error(f"Failed to remove temp file {file_path}: {cleanup_error}")
+        # NOTE: We no longer delete the file here because the Verification page 
+        # needs to serve the PDF to the user for human review.
+        pass
 
 @router.post("/", status_code=status.HTTP_202_ACCEPTED)
 async def upload_document(
@@ -134,13 +136,19 @@ async def upload_document(
     JOBS[job_id] = JobStatus(job_id=job_id, status="Extracting text...", progress=0)
     
     try:
-        # Save file temporarily to disk to avoid keeping large PDFs in memory
-        fd, path = tempfile.mkstemp(suffix=".pdf")
-        with os.fdopen(fd, 'wb') as f:
+        # Save file to static/pdfs for persistence
+        filename = f"{job_id}.pdf"
+        pdf_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "static", "pdfs")
+        if not os.path.exists(pdf_dir):
+            os.makedirs(pdf_dir, exist_ok=True)
+            
+        file_path = os.path.join(pdf_dir, filename)
+        
+        with open(file_path, "wb") as f:
             content = await file.read()
             f.write(content)
             
-        background_tasks.add_task(process_document, job_id, path, language)
+        background_tasks.add_task(process_document, job_id, file_path, language)
         return {"job_id": job_id, "status": "processing"}
         
     except Exception as e:

@@ -8,6 +8,7 @@ class JobStatus(BaseModel):
     job_id: str
     status: str
     progress: int
+    case_id: Optional[str] = None
     result: Optional[Any] = None
 
 # In-memory store for background job tracking

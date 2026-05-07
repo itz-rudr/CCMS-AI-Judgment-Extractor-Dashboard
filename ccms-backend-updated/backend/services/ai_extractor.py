@@ -45,15 +45,16 @@ class ExtractedAction(BaseModel):
 
     department: str = Field(
         description=(
-            "The responsible government department or authority. "
-            "Use 'BBMP Legal Cell' when BBMP is named, "
-            "'Court Registry' for registry instructions, "
-            "'Revenue Department' when revenue dept is named, "
-            "and 'Concerned Authority' when no explicit dept is mentioned."
+            "The broad government department responsible (e.g., 'Revenue', 'Urban Development', 'Education', 'Home'). "
+            "Use 'BBMP' for Bengaluru civic body matters."
         )
     )
+    responsible_officer: str | None = Field(
+        default=None,
+        description="The specific designation or office named in the order (e.g., 'Special Commissioner', 'Tahsildar', 'Assistant Engineer')."
+    )
     action_required: str = Field(
-        description="The precise action the department must perform as directed by the court."
+        description="A concise, actionable summary of the court's directive. Convert legal jargon into clear instructions."
     )
     deadline: str | None = Field(
         default=None,
@@ -113,43 +114,38 @@ class ExtractedCase(BaseModel):
 
 def build_system_prompt(output_language: str = "English") -> str:
     """Build the system prompt for the AI extractor."""
-    prompt = """You are a senior legal analyst specialising in Karnataka High Court judgments.
+    prompt = """You are an elite legal analyst for the Karnataka Government Decision Support System (CCMS).
+Your goal is to extract structured, ACTIONABLE legal intelligence from High Court judgments.
 
-Your task is to extract ALL court-directed actions and structured metadata from the judgment text
-provided by the user. The Karnataka HC uses specific language to issue directions — you must detect
-every instance of the following action keywords:
+CORE TASK:
+Identify every specific direction (Order/Directive) issued by the court to a government authority.
 
-  "Ordered", "Directed", "Disposed", "Issue notice", "Submit report",
-  "File affidavit", "Shall forthwith", "Within weeks", "Compliance",
-  "Registry shall", "Let", "Placed before", "Next date of hearing"
+DIRECTIVE EXTRACTION RULES:
+1. Summarise the Action: Convert legal phrases like "consider the representation of the petitioner" into "Dispose of Petitioner's Representation."
+2. Precision: If the court orders a specific time frame (e.g., "within 8 weeks"), ensure the deadline logic is followed.
+3. Department & Officer Mapping:
+   - Identify the primary Department (e.g., Revenue, BBMP, PWD, Health).
+   - Identify the specific Responsible Officer/Designation mentioned (e.g., Tahsildar, Commissioner, Deputy Director).
+   - If no specific officer is named, use the highest-ranking official in the relevant department named in the parties.
 
-DEPARTMENT MAPPING RULES (apply in order):
-1. If the direction starts with or names "BBMP" → department = "BBMP Legal Cell"
-2. If the direction refers to "Registry" or "Registry shall" → department = "Court Registry"
-3. If the direction explicitly names "Revenue Department" → department = "Revenue Department"
-4. If no explicit department or authority is named → department = "Concerned Authority"
+HIERARCHY OF AUTHORITY:
+- BBMP -> Department: "BBMP", Officer: "Commissioner" or specific Zonal Officer.
+- Tahsildar/AC/DC -> Department: "Revenue Department".
+- Police -> Department: "Home Department".
+- Education -> Department: "Education Department (Primary/Secondary)".
+- PWD/Engineering -> Department: "Public Works Department".
 
-DEADLINE RULES:
-- Convert relative expressions like "within four weeks", "within 6 weeks" to ISO dates relative
-  to the judgment date if stated; otherwise leave deadline = null.
-- "Forthwith" and "immediately" → priority = "high", deadline = null.
-
-OUTPUT RULES:
-- Extract source_text verbatim — do NOT paraphrase.
-- confidence_score = 1.0 for unambiguous court directions; reduce toward 0.5 for implied actions.
-- Deduplicate: do not emit the same action twice.
-- If no case number is found, use "UNKNOWN".
+EXTRACTION FOCUS:
+1. Legal Case ID: Extract the official citation (e.g. WP-21472-2025) as 'case_number'.
+2. Clean Text: Do NOT dump raw legal text into 'action_required'. Instead, produce a clean administrative instruction.
+3. Realistic Confidence: Never exceed 1.0 (100%). Use 0.95 for direct orders and 0.70 for implied ones.
 """
     prompt += f"""
 LANGUAGE INSTRUCTION:
 Your entire JSON response must be in {output_language}.
-Translate: action_required, department, summary, source_text.
+Translate: action_required, department, responsible_officer, summary, source_text.
 Do NOT translate: case_number, dates, legal section codes, 
-confidence_score, priority values (keep as high/medium/low).
-Supported languages: English, Hindi, Kannada.
-
-JSON SCHEMA ADDITIONS:
-- "limitation_period": "e.g. '90 days from date of order' or null if not mentioned"
+confidence_score (float 0.0-1.0), priority values (keep as high/medium/low).
 """
     return prompt
 

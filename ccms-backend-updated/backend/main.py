@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+import os
 
 from backend.routes import upload, jobs, extractions, verification, dashboard, cases
 
@@ -12,6 +14,13 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Serve PDFs for the verification page
+STATIC_PDF_DIR = os.path.join(os.path.dirname(__file__), "static", "pdfs")
+if not os.path.exists(STATIC_PDF_DIR):
+    os.makedirs(STATIC_PDF_DIR, exist_ok=True)
+
+app.mount("/static/pdfs", StaticFiles(directory=STATIC_PDF_DIR), name="static_pdfs")
 
 @app.on_event("startup")
 async def startup_event():
