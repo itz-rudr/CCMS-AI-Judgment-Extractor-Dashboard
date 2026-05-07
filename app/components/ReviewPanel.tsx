@@ -8,9 +8,9 @@ import {
   ChevronRight,
   FileText,
   Highlighter,
-  Pencil,
   ShieldAlert,
   XCircle,
+  Pencil
 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { Document, Page, pdfjs } from "react-pdf";
@@ -36,6 +36,8 @@ function ReviewWorkspace({ requestedId }: { requestedId: string | null }) {
   
   const [actions, setActions] = useState<any[]>([]);
   const [selectedHighlightId, setSelectedHighlightId] = useState<string | null>(null);
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [verificationMessage, setVerificationMessage] = useState<{type: 'success' | 'error', text: string} | null>(null);
   
   const pdfFile = useMemo(() => ({ url: "/sample.pdf" }), []);
   const safePageNumber = numPages ? Math.min(pageNumber, numPages) : pageNumber;
@@ -45,8 +47,6 @@ function ReviewWorkspace({ requestedId }: { requestedId: string | null }) {
     async function fetchActions() {
       try {
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
-        // If requestedId exists, we fetch for that case.
-        // Otherwise fallback to first case.
         let targetId = requestedId;
         if (!targetId) {
             const casesRes = await fetch(`${apiUrl}/api/cases`);
@@ -83,6 +83,35 @@ function ReviewWorkspace({ requestedId }: { requestedId: string | null }) {
     height: selectedAction.bounding_box[3] - selectedAction.bounding_box[1],
   } : null;
 
+  const handleVerify = async (status: 'approve' | 'reject') => {
+    if (!selectedAction) return;
+    setIsVerifying(true);
+    setVerificationMessage(null);
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+      // Using POST /api/actions/{action_id}/approve or reject
+      const res = await fetch(`${apiUrl}/api/actions/${selectedAction.id}/${status}?role=${role}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" }
+      });
+      
+      if (res.ok) {
+        setVerificationMessage({ type: 'success', text: `Action successfully ${status}d!` });
+        // Update local state to reflect the new status
+        setActions(actions.map(a => 
+          a.id === selectedAction.id ? { ...a, status: status === 'approve' ? 'approved' : 'rejected' } : a
+        ));
+      } else {
+        const errData = await res.json();
+        setVerificationMessage({ type: 'error', text: errData.detail || "You do not have permission. Try changing role to Judge." });
+      }
+    } catch (err: any) {
+      setVerificationMessage({ type: 'error', text: err.message || "Failed to connect to backend." });
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+
   return (
     <motion.div 
       initial={{ opacity: 0, y: 10 }}
@@ -105,7 +134,7 @@ function ReviewWorkspace({ requestedId }: { requestedId: string | null }) {
               className="text-sm border border-slate-200 rounded px-2 py-1"
             >
               <option value="officer">Officer (Sees Highlights)</option>
-              <option value="judge">Judge (Hidden Highlights)</option>
+              <option value="judge">Judge (Can Approve/Reject)</option>
             </select>
           </div>
         </div>
@@ -222,11 +251,11 @@ function ReviewWorkspace({ requestedId }: { requestedId: string | null }) {
           </div>
         </section>
 
-        {/* Right Side: AI Actions */}
+        {/* Right Side: AI Actions & Verification */}
         <section className="space-y-4 flex flex-col h-full">
           <div className="panel rounded-xl bg-white border border-slate-200 shadow-sm p-5 flex-1">
             
-            <div className="mt-6 pt-4 border-t border-slate-100">
+            <div className="mt-2 pt-2 border-t border-slate-100">
                <div className="flex items-center gap-2 text-sm font-bold text-slate-700 mb-3">
                 <CalendarClock size={16} className="text-blue-600" />
                 Proposed Action Plan
@@ -235,7 +264,7 @@ function ReviewWorkspace({ requestedId }: { requestedId: string | null }) {
                 {actions.length === 0 ? (
                   <p className="text-sm text-slate-400 italic">No actions found for this case.</p>
                 ) : actions.map((act) => (
-                  <div key={act.id} className="rounded-xl bg-slate-50 p-4 border border-slate-200">
+                  <div key={act.id} className={`rounded-xl p-4 border transition-all ${selectedHighlightId === act.id ? 'bg-amber-50/50 border-amber-200 shadow-sm' : 'bg-slate-50 border-slate-200'}`}>
                     <div className="flex justify-between items-start">
                       <p className="text-xs font-bold text-slate-700">{act.department}</p>
                       <span className={`text-xs px-2 py-1 rounded-full ${act.priority === 'high' ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-amber-50 text-amber-700 border border-amber-200'}`}>
@@ -244,7 +273,7 @@ function ReviewWorkspace({ requestedId }: { requestedId: string | null }) {
                     </div>
                     <p className="mt-2 text-sm font-semibold text-slate-900">{act.action_required}</p>
                     <p className="mt-2 text-xs text-slate-500">
-                      Deadline: {act.deadline}
+                      Deadline: {act.deadline} • Status: <strong className="uppercase">{act.status}</strong>
                     </p>
                   </div>
                 ))}
@@ -252,6 +281,42 @@ function ReviewWorkspace({ requestedId }: { requestedId: string | null }) {
             </div>
           </div>
 
+          {/* VERIFICATION BUTTONS PANEL */}
+          <div className="panel rounded-xl bg-slate-50 border border-slate-200 shadow-sm p-4">
+             <div className="flex items-center gap-2 text-sm font-bold text-slate-700 mb-3">
+                <CheckCircle2 size={16} className="text-emerald-600" />
+                Human Verification
+             </div>
+
+             {verificationMessage && (
+               <div className={`mb-4 p-3 rounded-md text-sm font-semibold border ${verificationMessage.type === 'success' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-rose-50 text-rose-700 border-rose-200'}`}>
+                 {verificationMessage.text}
+               </div>
+             )}
+
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <button
+                onClick={() => handleVerify('approve')}
+                disabled={isVerifying || !selectedAction}
+                className="focus-ring inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-emerald-700 disabled:opacity-50"
+              >
+                <CheckCircle2 size={16} />
+                {isVerifying ? "Verifying..." : "Approve Action"}
+              </button>
+              
+              <button
+                onClick={() => handleVerify('reject')}
+                disabled={isVerifying || !selectedAction}
+                className="focus-ring inline-flex items-center justify-center gap-2 rounded-lg border border-rose-200 bg-white px-4 py-2.5 text-sm font-bold text-rose-600 transition hover:bg-rose-50 disabled:opacity-50"
+              >
+                <XCircle size={16} />
+                {isVerifying ? "Verifying..." : "Reject"}
+              </button>
+            </div>
+            <p className="text-xs text-slate-500 mt-3 text-center">
+              Requires Judge role. Selecting "Approve" will update the database.
+            </p>
+          </div>
         </section>
       </div>
     </motion.div>
