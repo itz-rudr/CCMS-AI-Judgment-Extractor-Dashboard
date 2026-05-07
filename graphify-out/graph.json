@@ -1,0 +1,470 @@
+{
+  "directed": false,
+  "multigraph": false,
+  "graph": {},
+  "nodes": [
+    {
+      "label": "eslint.config.mjs",
+      "file_type": "code",
+      "source_file": "eslint.config.mjs",
+      "source_location": "L1",
+      "id": "eslint_config_mjs",
+      "community": 6,
+      "norm_label": "eslint.config.mjs"
+    },
+    {
+      "label": "next.config.ts",
+      "file_type": "code",
+      "source_file": "next.config.ts",
+      "source_location": "L1",
+      "id": "next_config_ts",
+      "community": 7,
+      "norm_label": "next.config.ts"
+    },
+    {
+      "label": "postcss.config.mjs",
+      "file_type": "code",
+      "source_file": "postcss.config.mjs",
+      "source_location": "L1",
+      "id": "postcss_config_mjs",
+      "community": 8,
+      "norm_label": "postcss.config.mjs"
+    },
+    {
+      "label": "layout.tsx",
+      "file_type": "code",
+      "source_file": "app/layout.tsx",
+      "source_location": "L1",
+      "id": "app_layout_tsx",
+      "community": 4,
+      "norm_label": "layout.tsx"
+    },
+    {
+      "label": "RootLayout()",
+      "file_type": "code",
+      "source_file": "app/layout.tsx",
+      "source_location": "L3",
+      "id": "app_layout_rootlayout",
+      "community": 4,
+      "norm_label": "rootlayout()"
+    },
+    {
+      "label": "page.tsx",
+      "file_type": "code",
+      "source_file": "app/page.tsx",
+      "source_location": "L1",
+      "id": "app_page_tsx",
+      "community": 1,
+      "norm_label": "page.tsx"
+    },
+    {
+      "label": "Home()",
+      "file_type": "code",
+      "source_file": "app/page.tsx",
+      "source_location": "L5",
+      "id": "app_page_home",
+      "community": 1,
+      "norm_label": "home()"
+    },
+    {
+      "label": "CaseTable.tsx",
+      "file_type": "code",
+      "source_file": "app/components/CaseTable.tsx",
+      "source_location": "L1",
+      "id": "app_components_casetable_tsx",
+      "community": 1,
+      "norm_label": "casetable.tsx"
+    },
+    {
+      "label": "Navbar.tsx",
+      "file_type": "code",
+      "source_file": "app/components/Navbar.tsx",
+      "source_location": "L1",
+      "id": "app_components_navbar_tsx",
+      "community": 0,
+      "norm_label": "navbar.tsx"
+    },
+    {
+      "label": "Navbar()",
+      "file_type": "code",
+      "source_file": "app/components/Navbar.tsx",
+      "source_location": "L3",
+      "id": "components_navbar_navbar",
+      "community": 0,
+      "norm_label": "navbar()"
+    },
+    {
+      "label": "ReviewPanel.tsx",
+      "file_type": "code",
+      "source_file": "app/components/ReviewPanel.tsx",
+      "source_location": "L1",
+      "id": "app_components_reviewpanel_tsx",
+      "community": 3,
+      "norm_label": "reviewpanel.tsx"
+    },
+    {
+      "label": "onDocumentLoadSuccess()",
+      "file_type": "code",
+      "source_file": "app/components/ReviewPanel.tsx",
+      "source_location": "L24",
+      "id": "components_reviewpanel_ondocumentloadsuccess",
+      "community": 3,
+      "norm_label": "ondocumentloadsuccess()"
+    },
+    {
+      "label": "Sidebar.tsx",
+      "file_type": "code",
+      "source_file": "app/components/Sidebar.tsx",
+      "source_location": "L1",
+      "id": "app_components_sidebar_tsx",
+      "community": 0,
+      "norm_label": "sidebar.tsx"
+    },
+    {
+      "label": "Sidebar()",
+      "file_type": "code",
+      "source_file": "app/components/Sidebar.tsx",
+      "source_location": "L7",
+      "id": "components_sidebar_sidebar",
+      "community": 0,
+      "norm_label": "sidebar()"
+    },
+    {
+      "label": "StatsCard.tsx",
+      "file_type": "code",
+      "source_file": "app/components/StatsCard.tsx",
+      "source_location": "L1",
+      "id": "app_components_statscard_tsx",
+      "community": 1,
+      "norm_label": "statscard.tsx"
+    },
+    {
+      "label": "StatsCard()",
+      "file_type": "code",
+      "source_file": "app/components/StatsCard.tsx",
+      "source_location": "L6",
+      "id": "components_statscard_statscard",
+      "community": 1,
+      "norm_label": "statscard()"
+    },
+    {
+      "label": "MainLayout.tsx",
+      "file_type": "code",
+      "source_file": "app/layouts/MainLayout.tsx",
+      "source_location": "L1",
+      "id": "app_layouts_mainlayout_tsx",
+      "community": 0,
+      "norm_label": "mainlayout.tsx"
+    },
+    {
+      "label": "MainLayout()",
+      "file_type": "code",
+      "source_file": "app/layouts/MainLayout.tsx",
+      "source_location": "L6",
+      "id": "layouts_mainlayout_mainlayout",
+      "community": 0,
+      "norm_label": "mainlayout()"
+    },
+    {
+      "label": "page.tsx",
+      "file_type": "code",
+      "source_file": "app/review/page.tsx",
+      "source_location": "L1",
+      "id": "app_review_page_tsx",
+      "community": 3,
+      "norm_label": "page.tsx"
+    },
+    {
+      "label": "ReviewPage()",
+      "file_type": "code",
+      "source_file": "app/review/page.tsx",
+      "source_location": "L4",
+      "id": "review_page_reviewpage",
+      "community": 3,
+      "norm_label": "reviewpage()"
+    },
+    {
+      "label": "AGENTS.md",
+      "file_type": "document",
+      "source_file": "AGENTS.md",
+      "source_location": "L1",
+      "id": "agents_md",
+      "community": 5,
+      "norm_label": "agents.md"
+    },
+    {
+      "label": "This is NOT the Next.js you know",
+      "file_type": "document",
+      "source_file": "AGENTS.md",
+      "source_location": "L2",
+      "id": "ccms_ai_judgment_extractor_dashboard_agents_this_is_not_the_next_js_you_know",
+      "community": 5,
+      "norm_label": "this is not the next.js you know"
+    },
+    {
+      "label": "CLAUDE.md",
+      "file_type": "document",
+      "source_file": "CLAUDE.md",
+      "source_location": "L1",
+      "id": "claude_md",
+      "community": 9,
+      "norm_label": "claude.md"
+    },
+    {
+      "label": "README.md",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L1",
+      "id": "readme_md",
+      "community": 2,
+      "norm_label": "readme.md"
+    },
+    {
+      "label": "Getting Started",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L3",
+      "id": "ccms_ai_judgment_extractor_dashboard_readme_getting_started",
+      "community": 2,
+      "norm_label": "getting started"
+    },
+    {
+      "label": "code:bash (npm run dev)",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L7",
+      "id": "ccms_ai_judgment_extractor_dashboard_readme_codeblock_1",
+      "community": 2,
+      "norm_label": "code:bash (npm run dev)"
+    },
+    {
+      "label": "Learn More",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L23",
+      "id": "ccms_ai_judgment_extractor_dashboard_readme_learn_more",
+      "community": 2,
+      "norm_label": "learn more"
+    },
+    {
+      "label": "Deploy on Vercel",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L32",
+      "id": "ccms_ai_judgment_extractor_dashboard_readme_deploy_on_vercel",
+      "community": 2,
+      "norm_label": "deploy on vercel"
+    }
+  ],
+  "links": [
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app/layout.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "app_layout_tsx",
+      "target": "app_layout_rootlayout",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app/page.tsx",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "app_page_tsx",
+      "target": "app_layouts_mainlayout_tsx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app/page.tsx",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "app_page_tsx",
+      "target": "app_components_statscard_tsx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app/page.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "app_page_tsx",
+      "target": "app_components_casetable_tsx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app/page.tsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "app_page_tsx",
+      "target": "app_page_home",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app/components/Navbar.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "app_components_navbar_tsx",
+      "target": "components_navbar_navbar",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app/layouts/MainLayout.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "app_layouts_mainlayout_tsx",
+      "target": "app_components_navbar_tsx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app/components/ReviewPanel.tsx",
+      "source_location": "L24",
+      "weight": 1.0,
+      "source": "app_components_reviewpanel_tsx",
+      "target": "components_reviewpanel_ondocumentloadsuccess",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app/review/page.tsx",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "app_review_page_tsx",
+      "target": "app_components_reviewpanel_tsx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app/components/Sidebar.tsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "app_components_sidebar_tsx",
+      "target": "components_sidebar_sidebar",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app/layouts/MainLayout.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "app_layouts_mainlayout_tsx",
+      "target": "app_components_sidebar_tsx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app/components/StatsCard.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "app_components_statscard_tsx",
+      "target": "components_statscard_statscard",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app/layouts/MainLayout.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "app_layouts_mainlayout_tsx",
+      "target": "layouts_mainlayout_mainlayout",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app/review/page.tsx",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "app_review_page_tsx",
+      "target": "app_layouts_mainlayout_tsx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app/review/page.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "app_review_page_tsx",
+      "target": "review_page_reviewpage",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "AGENTS.md",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "agents_md",
+      "target": "ccms_ai_judgment_extractor_dashboard_agents_this_is_not_the_next_js_you_know",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "readme_md",
+      "target": "ccms_ai_judgment_extractor_dashboard_readme_getting_started",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L23",
+      "weight": 1.0,
+      "source": "readme_md",
+      "target": "ccms_ai_judgment_extractor_dashboard_readme_learn_more",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L32",
+      "weight": 1.0,
+      "source": "readme_md",
+      "target": "ccms_ai_judgment_extractor_dashboard_readme_deploy_on_vercel",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "ccms_ai_judgment_extractor_dashboard_readme_getting_started",
+      "target": "ccms_ai_judgment_extractor_dashboard_readme_codeblock_1",
+      "confidence_score": 1.0
+    }
+  ],
+  "hyperedges": [],
+  "built_at_commit": "e76b4fb750001c3e5f87fef61c6ea7e78904f1c7"
+}

@@ -1,25 +1,42 @@
+"use client";
+
+import { useEffect, useState } from "react";
+
 type Case = {
   id: string;
+  case_number?: string;
   department: string;
   deadline: string;
   status: string;
 };
 
 export default function CaseTable() {
-  const cases: Case[] = [
-    {
-      id: "C001",
-      department: "Legal",
-      deadline: "2026-05-10",
-      status: "Pending",
-    },
-    {
-      id: "C002",
-      department: "Police",
-      deadline: "2026-05-12",
-      status: "Approved",
-    },
-  ];
+  const [cases, setCases] = useState<Case[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchCases() {
+      try {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+        const res = await fetch(`${apiUrl}/api/cases`);
+        const data = await res.json();
+        
+        // Map backend response to UI Case type
+        const mapped = data.map((c: any) => ({
+          id: c.case_number || c.id,
+          department: "Legal Dept", // fallback
+          deadline: c.order_date || c.next_hearing_date || "TBD",
+          status: "Pending", // fallback
+        }));
+        setCases(mapped);
+      } catch (err) {
+        console.error("Failed to fetch cases:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchCases();
+  }, []);
 
   return (
     <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
@@ -44,7 +61,15 @@ export default function CaseTable() {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
-            {cases.map((c, index) => (
+            {loading ? (
+              <tr>
+                <td colSpan={4} className="px-6 py-4 text-center text-slate-500">Loading cases...</td>
+              </tr>
+            ) : cases.length === 0 ? (
+              <tr>
+                <td colSpan={4} className="px-6 py-4 text-center text-slate-500">No cases found in database.</td>
+              </tr>
+            ) : cases.map((c, index) => (
               <tr key={c.id} className={`transition ${index % 2 === 0 ? "bg-slate-50/40" : "bg-white"} hover:bg-slate-100`}>
                 <td className="px-6 py-4 text-slate-700">{c.id}</td>
                 <td className="px-6 py-4 text-slate-700">{c.department}</td>

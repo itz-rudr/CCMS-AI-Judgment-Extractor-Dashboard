@@ -1,25 +1,48 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
 export default function ReviewPanel() {
-  const ORIGINAL_WIDTH = 1000; // assume for now
+  const ORIGINAL_WIDTH = 1000;
   const [numPages, setNumPages] = useState<number | null>(null);
   const [pageNumber, setPageNumber] = useState(1);
   const [pageWidth, setPageWidth] = useState(600);
   const scale = pageWidth / ORIGINAL_WIDTH;
 
-  // 🔥 Example bounding box from backend
-  const bbox = {
-    page: 1,
-    x: 100,
-    y: 150,
-    width: 200,
-    height: 50,
-  };
+  const [actions, setActions] = useState<any[]>([]);
+  const [role, setRole] = useState("officer");
+
+  useEffect(() => {
+    async function fetchActions() {
+      try {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+        const casesRes = await fetch(`${apiUrl}/api/cases`);
+        const casesData = await casesRes.json();
+        
+        if (casesData && casesData.length > 0) {
+          const caseId = casesData[0].id;
+          const actionsRes = await fetch(`${apiUrl}/api/cases/${caseId}/actions?role=${role}`);
+          const actionsData = await actionsRes.json();
+          setActions(actionsData);
+        }
+      } catch (err) {
+        console.error("Failed to fetch actions:", err);
+      }
+    }
+    fetchActions();
+  }, [role]);
+
+  const firstAction = actions.length > 0 ? actions[0] : null;
+  const bbox = firstAction?.bounding_box ? {
+    page: firstAction.bbox_page || 1,
+    x: firstAction.bounding_box[0],
+    y: firstAction.bounding_box[1],
+    width: firstAction.bounding_box[2] - firstAction.bounding_box[0],
+    height: firstAction.bounding_box[3] - firstAction.bounding_box[1],
+  } : null;
 
   const onDocumentLoadSuccess = ({ numPages }: any) => {
     setNumPages(numPages);
@@ -41,6 +64,17 @@ export default function ReviewPanel() {
           <p className="text-sm text-slate-500">
             Use the controls below to review pages and inspect highlighted content.
           </p>
+          <div className="flex items-center gap-2 mt-2">
+            <span className="text-sm text-slate-500">View as:</span>
+            <select 
+              value={role} 
+              onChange={(e) => setRole(e.target.value)}
+              className="text-sm border border-slate-200 rounded px-2 py-1"
+            >
+              <option value="officer">Officer (Sees Highlights)</option>
+              <option value="judge">Judge (Hidden Highlights)</option>
+            </select>
+          </div>
         </div>
 
         <div className="relative mt-4 overflow-hidden rounded-3xl bg-slate-50 p-4">
@@ -48,7 +82,7 @@ export default function ReviewPanel() {
             <Page pageNumber={pageNumber} width={pageWidth} />
           </Document>
 
-          {pageNumber === bbox.page && (
+          {bbox && pageNumber === bbox.page && (
             <div
               className="pointer-events-none absolute border-2 border-red-500 bg-red-500/15"
               style={{
@@ -68,11 +102,9 @@ export default function ReviewPanel() {
           >
             Prev
           </button>
-
           <p className="text-sm text-slate-600">
             Page {pageNumber} of {numPages || "..."}
           </p>
-
           <button
             onClick={() =>
               setPageNumber((p) =>
@@ -92,7 +124,9 @@ export default function ReviewPanel() {
             <p className="text-xs uppercase tracking-[0.24em] text-slate-400">AI Data Panel</p>
             <h2 className="mt-2 text-2xl font-semibold">Insights & Actions</h2>
           </div>
-          <span className="rounded-full bg-white/10 px-3 py-1 text-sm text-slate-100">Live</span>
+          <span className="rounded-full bg-emerald-500/20 text-emerald-400 px-3 py-1 text-sm border border-emerald-500/30">
+            Connected to API
+          </span>
         </div>
 
         <p className="mt-4 text-sm text-slate-300">
@@ -100,21 +134,27 @@ export default function ReviewPanel() {
         </p>
 
         <div className="mt-6 grid gap-4">
-          <div className="rounded-3xl bg-white/5 p-4">
-            <p className="text-xs uppercase tracking-[0.24em] text-slate-400">Detected issue</p>
-            <p className="mt-2 text-lg font-semibold text-white">Potential evidence mismatch</p>
-            <p className="mt-2 text-sm leading-6 text-slate-300">
-              The AI flagged a possible inconsistency in the document extraction that should be reviewed manually.
-            </p>
-          </div>
-
-          <div className="rounded-3xl bg-white/5 p-4">
-            <p className="text-xs uppercase tracking-[0.24em] text-slate-400">Next step</p>
-            <p className="mt-2 text-lg font-semibold text-white">Assign reviewer</p>
-            <p className="mt-2 text-sm leading-6 text-slate-300">
-              Assign this case to a specialist for validation and follow up with the evidence team.
-            </p>
-          </div>
+          {actions.length === 0 ? (
+             <p className="text-sm text-slate-400 italic">No actions found for this case.</p>
+          ) : actions.map((act) => (
+            <div key={act.id} className="rounded-3xl bg-white/5 p-4 border border-white/10">
+              <div className="flex justify-between items-start">
+                <p className="text-xs uppercase tracking-[0.24em] text-sky-400">{act.department}</p>
+                <span className={`text-xs px-2 py-1 rounded-full ${act.priority === 'high' ? 'bg-red-500/20 text-red-400' : 'bg-yellow-500/20 text-yellow-400'}`}>
+                  {act.priority} priority
+                </span>
+              </div>
+              <p className="mt-2 text-lg font-semibold text-white">{act.action_required}</p>
+              <p className="mt-2 text-sm leading-6 text-slate-300">
+                Deadline: {act.deadline} • Confidence: {Math.round((act.confidence_score || 0) * 100)}%
+              </p>
+              {act.source_text_quote && (
+                <blockquote className="mt-3 border-l-2 border-slate-600 pl-3 text-sm italic text-slate-400">
+                  "{act.source_text_quote}"
+                </blockquote>
+              )}
+            </div>
+          ))}
         </div>
       </div>
     </div>

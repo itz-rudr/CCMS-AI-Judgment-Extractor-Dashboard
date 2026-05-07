@@ -1,0 +1,90 @@
+{
+  "C:\\Users\\Dell\\Downloads\\CCMS-AI-Judgment-Extractor-Dashboard\\eslint.config.mjs": {
+    "mtime": 1778088491.5338373,
+    "hash": "6c4307ffa009658f5c97f5629094c0c2"
+  },
+  "C:\\Users\\Dell\\Downloads\\CCMS-AI-Judgment-Extractor-Dashboard\\next.config.ts": {
+    "mtime": 1778088491.5338373,
+    "hash": "025f4fcb6024b3524d19492cf7ce54a2"
+  },
+  "C:\\Users\\Dell\\Downloads\\CCMS-AI-Judgment-Extractor-Dashboard\\postcss.config.mjs": {
+    "mtime": 1778088454.5220127,
+    "hash": "481fac0fdecd70e1821cc30b86030c1a"
+  },
+  "C:\\Users\\Dell\\Downloads\\CCMS-AI-Judgment-Extractor-Dashboard\\schema.sql": {
+    "mtime": 1778087198.3162868,
+    "hash": "e2a05f6765e32345474b17a4fb021538"
+  },
+  "C:\\Users\\Dell\\Downloads\\CCMS-AI-Judgment-Extractor-Dashboard\\app\\layout.tsx": {
+    "mtime": 1778088491.528094,
+    "hash": "df43f8b190660b64d13121ae98876996"
+  },
+  "C:\\Users\\Dell\\Downloads\\CCMS-AI-Judgment-Extractor-Dashboard\\app\\page.tsx": {
+    "mtime": 1778088491.531593,
+    "hash": "2790368cd1b86927fe6739558832850f"
+  },
+  "C:\\Users\\Dell\\Downloads\\CCMS-AI-Judgment-Extractor-Dashboard\\app\\components\\CaseTable.tsx": {
+    "mtime": 1778088491.528094,
+    "hash": "3854546e745837e9ced8cc8880b07fba"
+  },
+  "C:\\Users\\Dell\\Downloads\\CCMS-AI-Judgment-Extractor-Dashboard\\app\\components\\Navbar.tsx": {
+    "mtime": 1778088491.528094,
+    "hash": "df7b960ac5bb0ba441a0daba28c8ae7a"
+  },
+  "C:\\Users\\Dell\\Downloads\\CCMS-AI-Judgment-Extractor-Dashboard\\app\\components\\ReviewPanel.tsx": {
+    "mtime": 1778088491.528094,
+    "hash": "8fcf6f0402285f22f0ea757f9ca7c003"
+  },
+  "C:\\Users\\Dell\\Downloads\\CCMS-AI-Judgment-Extractor-Dashboard\\app\\components\\Sidebar.tsx": {
+    "mtime": 1778088491.528094,
+    "hash": "318fe667bdc3ff88e90c7917cc6d073b"
+  },
+  "C:\\Users\\Dell\\Downloads\\CCMS-AI-Judgment-Extractor-Dashboard\\app\\components\\StatsCard.tsx": {
+    "mtime": 1778088491.528094,
+    "hash": "652e0007ee4555c0483f4c0f9c887c12"
+  },
+  "C:\\Users\\Dell\\Downloads\\CCMS-AI-Judgment-Extractor-Dashboard\\app\\layouts\\MainLayout.tsx": {
+    "mtime": 1778088491.531593,
+    "hash": "f2ff564d19a1d2c0b81eb83b4f8fe959"
+  },
+  "C:\\Users\\Dell\\Downloads\\CCMS-AI-Judgment-Extractor-Dashboard\\app\\review\\page.tsx": {
+    "mtime": 1778088491.531593,
+    "hash": "61d25267b4ef5d73c2ea35599405d293"
+  },
+  "C:\\Users\\Dell\\Downloads\\CCMS-AI-Judgment-Extractor-Dashboard\\AGENTS.md": {
+    "mtime": 1778088454.5070932,
+    "hash": "9346a4897ff955555ddedb7bebf77adb"
+  },
+  "C:\\Users\\Dell\\Downloads\\CCMS-AI-Judgment-Extractor-Dashboard\\CLAUDE.md": {
+    "mtime": 1778088454.5070932,
+    "hash": "771faa62feb60b7de901a397aebb29b0"
+  },
+  "C:\\Users\\Dell\\Downloads\\CCMS-AI-Judgment-Extractor-Dashboard\\README.md": {
+    "mtime": 1778088454.5081613,
+    "hash": "9162add00befbcdb432430f405c4ad8d"
+  },
+  "C:\\Users\\Dell\\Downloads\\CCMS-AI-Judgment-Extractor-Dashboard\\public\\sample.pdf": {
+    "mtime": 1778088454.5391662,
+    "hash": "4a6ee413fedbc83da04de955ca243561"
+  },
+  "C:\\Users\\Dell\\Downloads\\CCMS-AI-Judgment-Extractor-Dashboard\\public\\file.svg": {
+    "mtime": 1778088454.5220127,
+    "hash": "d09f95206c3fa0bb9bd9fefabfd0ea71"
+  },
+  "C:\\Users\\Dell\\Downloads\\CCMS-AI-Judgment-Extractor-Dashboard\\public\\globe.svg": {
+    "mtime": 1778088454.5230966,
+    "hash": "2aaafa6a49b6563925fe440891e32717"
+  },
+  "C:\\Users\\Dell\\Downloads\\CCMS-AI-Judgment-Extractor-Dashboard\\public\\next.svg": {
+    "mtime": 1778088454.5230966,
+    "hash": "8e061864f388b47f33a1c3780831193e"
+  },
+  "C:\\Users\\Dell\\Downloads\\CCMS-AI-Judgment-Extractor-Dashboard\\public\\vercel.svg": {
+    "mtime": 1778088454.5401616,
+    "hash": "c0af2f507b369b085b35ef4bbe3bcf1e"
+  },
+  "C:\\Users\\Dell\\Downloads\\CCMS-AI-Judgment-Extractor-Dashboard\\public\\window.svg": {
+    "mtime": 1778088454.5401616,
+    "hash": "a2760511c65806022ad20adf74370ff3"
+  }
+}
