@@ -1,0 +1,5 @@
+.env
+__pycache__/
+raw_pdfs/*
+!raw_pdfs/.gitkeep
+venv/
