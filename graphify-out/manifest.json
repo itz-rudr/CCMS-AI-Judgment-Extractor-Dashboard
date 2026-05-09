@@ -1,0 +1,154 @@
+{
+  "D:\\Frontend (CCMS AI)\\ccms-frontend\\eslint.config.mjs": {
+    "mtime": 1777910052.4726272,
+    "hash": "a9ec4be1e58c21c81e339cd25c87caff"
+  },
+  "D:\\Frontend (CCMS AI)\\ccms-frontend\\next-env.d.ts": {
+    "mtime": 1778080083.4645734,
+    "hash": "d0f8375ae1199dc7acd3977fc33b78b8"
+  },
+  "D:\\Frontend (CCMS AI)\\ccms-frontend\\next.config.ts": {
+    "mtime": 1777910060.4118335,
+    "hash": "154177f65fdb13f40bd06e8a890eacc6"
+  },
+  "D:\\Frontend (CCMS AI)\\ccms-frontend\\postcss.config.mjs": {
+    "mtime": 1777835949.72659,
+    "hash": "239f3ebf717465dc636818a1a619398d"
+  },
+  "D:\\Frontend (CCMS AI)\\ccms-frontend\\update_locales.js": {
+    "mtime": 1778087526.186335,
+    "hash": "30bc4f116b05cc04c8cf39edcda10e54"
+  },
+  "D:\\Frontend (CCMS AI)\\ccms-frontend\\app\\layout.tsx": {
+    "mtime": 1778087526.1763122,
+    "hash": "da5ef4fa27465356aea44db941f1581b"
+  },
+  "D:\\Frontend (CCMS AI)\\ccms-frontend\\app\\page.tsx": {
+    "mtime": 1778095720.5477772,
+    "hash": "224991dd98a2efc5be1c7e43d93251fa"
+  },
+  "D:\\Frontend (CCMS AI)\\ccms-frontend\\app\\analytics\\page.tsx": {
+    "mtime": 1778095583.3043072,
+    "hash": "a543a87f64b2690f7f4a39d1299a6fd8"
+  },
+  "D:\\Frontend (CCMS AI)\\ccms-frontend\\app\\cases\\page.tsx": {
+    "mtime": 1778095542.7364836,
+    "hash": "8bbf31757fc123b832b91ccf1761234c"
+  },
+  "D:\\Frontend (CCMS AI)\\ccms-frontend\\app\\components\\AuthGuard.tsx": {
+    "mtime": 1778087526.1658826,
+    "hash": "733bcd19da7fe6b07b756b3779a96e1d"
+  },
+  "D:\\Frontend (CCMS AI)\\ccms-frontend\\app\\components\\CaseTable.tsx": {
+    "mtime": 1778095509.8494682,
+    "hash": "778a20d1f28d121078b1d0599359eb83"
+  },
+  "D:\\Frontend (CCMS AI)\\ccms-frontend\\app\\components\\FilterPanel.tsx": {
+    "mtime": 1778087526.1683817,
+    "hash": "754db3628eb1708d6a54abbc028b8b53"
+  },
+  "D:\\Frontend (CCMS AI)\\ccms-frontend\\app\\components\\Navbar.tsx": {
+    "mtime": 1778087526.1693947,
+    "hash": "a03c8bfbdcc94197509023dab1063868"
+  },
+  "D:\\Frontend (CCMS AI)\\ccms-frontend\\app\\components\\NotificationBell.tsx": {
+    "mtime": 1778087526.1693947,
+    "hash": "e2fb42c2566e3f0a53c740eaedfbc222"
+  },
+  "D:\\Frontend (CCMS AI)\\ccms-frontend\\app\\components\\PriorityCaseCard.tsx": {
+    "mtime": 1778087526.1704,
+    "hash": "a0cefd56a3a7b2c3c3d56d297152edd6"
+  },
+  "D:\\Frontend (CCMS AI)\\ccms-frontend\\app\\components\\ReviewPanel.tsx": {
+    "mtime": 1778095779.4053762,
+    "hash": "892ec966b976563b92772df97f6e6274"
+  },
+  "D:\\Frontend (CCMS AI)\\ccms-frontend\\app\\components\\Sidebar.tsx": {
+    "mtime": 1778087526.1724212,
+    "hash": "688f84fd830929c33c900c62f5ae0f6e"
+  },
+  "D:\\Frontend (CCMS AI)\\ccms-frontend\\app\\contexts\\AuthContext.tsx": {
+    "mtime": 1778087526.1724212,
+    "hash": "d4a68f6d8a68f1256a292c7eb60019a0"
+  },
+  "D:\\Frontend (CCMS AI)\\ccms-frontend\\app\\contexts\\SettingsContext.tsx": {
+    "mtime": 1778087526.1736574,
+    "hash": "4488fe50c42c47e6a536da1e997c50d9"
+  },
+  "D:\\Frontend (CCMS AI)\\ccms-frontend\\app\\hooks\\useTranslation.ts": {
+    "mtime": 1778087526.1752982,
+    "hash": "1cf8e9d1d865a26dd439189b692df78c"
+  },
+  "D:\\Frontend (CCMS AI)\\ccms-frontend\\app\\layouts\\MainLayout.tsx": {
+    "mtime": 1778087526.1773171,
+    "hash": "7c2e7e4e3eeb61b1610fe2181f3ba7b4"
+  },
+  "D:\\Frontend (CCMS AI)\\ccms-frontend\\app\\lib\\ccms-data.ts": {
+    "mtime": 1778087520.6545107,
+    "hash": "a066b993f9a8b646ea850ccb0f234e8c"
+  },
+  "D:\\Frontend (CCMS AI)\\ccms-frontend\\app\\lib\\i18n.ts": {
+    "mtime": 1778087526.178781,
+    "hash": "4be43bbc71ab5afb6c49cfa28b9432ea"
+  },
+  "D:\\Frontend (CCMS AI)\\ccms-frontend\\app\\login\\page.tsx": {
+    "mtime": 1778087526.178781,
+    "hash": "80779471359dd23d3034ece04aa9ea06"
+  },
+  "D:\\Frontend (CCMS AI)\\ccms-frontend\\app\\review\\page.tsx": {
+    "mtime": 1777910360.8553991,
+    "hash": "c45f43cd0727cc0297698ec976330935"
+  },
+  "D:\\Frontend (CCMS AI)\\ccms-frontend\\app\\services\\api.ts": {
+    "mtime": 1778095459.461835,
+    "hash": "ec8998ec3544ce44bf64d80b009a655c"
+  },
+  "D:\\Frontend (CCMS AI)\\ccms-frontend\\app\\settings\\page.tsx": {
+    "mtime": 1778087526.1812637,
+    "hash": "2c74fcf538bbd9e1c324644c01ec0f7a"
+  },
+  "D:\\Frontend (CCMS AI)\\ccms-frontend\\public\\pdf.worker.min.js": {
+    "mtime": 1777879563.4016302,
+    "hash": "84a3a561235b6c4abe1f41fdcf547791"
+  },
+  "D:\\Frontend (CCMS AI)\\ccms-frontend\\public\\pdf.worker.min.mjs": {
+    "mtime": 1777879563.4016302,
+    "hash": "84a3a561235b6c4abe1f41fdcf547791"
+  },
+  "D:\\Frontend (CCMS AI)\\ccms-frontend\\AGENTS.md": {
+    "mtime": 1777836140.9563248,
+    "hash": "9e09241799026ac05be315a2f0b50055"
+  },
+  "D:\\Frontend (CCMS AI)\\ccms-frontend\\CLAUDE.md": {
+    "mtime": 1777836140.957329,
+    "hash": "5c27369b226fcf2be8a6cfe52224e767"
+  },
+  "D:\\Frontend (CCMS AI)\\ccms-frontend\\README.md": {
+    "mtime": 1777835949.6235907,
+    "hash": "f15aaa42d5d299d091b1171097ea56ad"
+  },
+  "D:\\Frontend (CCMS AI)\\ccms-frontend\\public\\sample.pdf": {
+    "mtime": 1777838655.569487,
+    "hash": "4a6ee413fedbc83da04de955ca243561"
+  },
+  "D:\\Frontend (CCMS AI)\\ccms-frontend\\public\\file.svg": {
+    "mtime": 1777835949.7493992,
+    "hash": "d09f95206c3fa0bb9bd9fefabfd0ea71"
+  },
+  "D:\\Frontend (CCMS AI)\\ccms-frontend\\public\\globe.svg": {
+    "mtime": 1777835949.7729366,
+    "hash": "2aaafa6a49b6563925fe440891e32717"
+  },
+  "D:\\Frontend (CCMS AI)\\ccms-frontend\\public\\next.svg": {
+    "mtime": 1777835949.7958517,
+    "hash": "8e061864f388b47f33a1c3780831193e"
+  },
+  "D:\\Frontend (CCMS AI)\\ccms-frontend\\public\\vercel.svg": {
+    "mtime": 1777835949.8197656,
+    "hash": "c0af2f507b369b085b35ef4bbe3bcf1e"
+  },
+  "D:\\Frontend (CCMS AI)\\ccms-frontend\\public\\window.svg": {
+    "mtime": 1777835949.8422537,
+    "hash": "a2760511c65806022ad20adf74370ff3"
+  }
+}

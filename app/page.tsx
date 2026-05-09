@@ -1,15 +1,15 @@
 "use client";
 
-import { approvedActionPlans, dashboardStats, judgmentCases, departmentSummary } from "./lib/ccms-data";
+import { approvedActionPlans, judgmentCases, departmentSummary } from "./lib/ccms-data";
 import MainLayout from "./layouts/MainLayout";
-import { ShieldCheck, CalendarClock, Gavel, CheckCircle2, AlertTriangle, ArrowRight, Filter, ChevronDown, Calendar as CalendarIcon, Building2, X } from "lucide-react";
+import { CalendarClock, Gavel, CheckCircle2, AlertTriangle, ArrowRight, Filter, Wifi, WifiOff, RefreshCw } from "lucide-react";
 import { motion, Variants, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import PriorityCaseCard from "./components/PriorityCaseCard";
-import { useState, useRef, useMemo } from "react";
+import { useState, useRef, useMemo, useEffect, useCallback } from "react";
 import FilterPanel, { FilterState } from "./components/FilterPanel";
-import { useSettings } from "./contexts/SettingsContext";
 import { useTranslation } from "./hooks/useTranslation";
+import { getDashboardCases, getAnalytics, type ApiCase, type AnalyticsData } from "./services/api";
 
 const container: Variants = {
   hidden: { opacity: 0 },
@@ -26,8 +26,42 @@ const item: Variants = {
 
 export default function Dashboard() {
   const expandedRef = useRef<HTMLDivElement>(null);
-  
   const { t } = useTranslation();
+
+  // Live data state
+  const [liveCases, setLiveCases] = useState<ApiCase[] | null>(null);
+  const [liveAnalytics, setLiveAnalytics] = useState<AnalyticsData | null>(null);
+  const [isLive, setIsLive] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fetchDashboard = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const [cases, analytics] = await Promise.all([getDashboardCases(), getAnalytics()]);
+      setLiveCases(cases);
+      setLiveAnalytics(analytics);
+      setIsLive(true);
+    } catch {
+      setIsLive(false);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { fetchDashboard(); }, [fetchDashboard]);
+
+  // Use live data if available, fallback to static mock
+  const activeCases = (liveCases ?? judgmentCases) as unknown as (typeof judgmentCases);
+  const activeDepts = liveAnalytics?.departmentSummary?.map(d => ({
+    name: d.name, approved: d.compliance, review: d.pending, overdue: d.overdue
+  })) ?? departmentSummary;
+  const activeActionPlans = liveCases?.filter(c => c.reviewStatus === "Approved") as unknown as (typeof approvedActionPlans) ?? approvedActionPlans;
+
+  // Stats from analytics
+  const totalVerified = liveAnalytics?.pipelineSteps?.find(s => s.title === "Total Approved")?.count ?? 312;
+  const pendingCount = liveAnalytics?.pipelineSteps?.find(s => s.title === "Pending Review")?.count ?? 76;
+  const rejectedCount = liveAnalytics?.pipelineSteps?.find(s => s.title === "Total Rejected")?.count ?? 18;
+  const totalExtracted = liveAnalytics?.pipelineSteps?.find(s => s.title === "Total Extracted")?.count ?? 24;
 
   // Filter States
   const [advancedFilters, setAdvancedFilters] = useState<FilterState>({
@@ -38,11 +72,10 @@ export default function Dashboard() {
   });
   const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(false);
 
-  // Derived Data
-  const departments = useMemo(() => Array.from(new Set(judgmentCases.map(c => c.department))), []);
+  const departments = useMemo(() => Array.from(new Set(activeCases.map(c => c.department))), [activeCases]);
 
   const filteredCases = useMemo(() => {
-    return judgmentCases.filter(c => {
+    return activeCases.filter(c => {
       // Advanced Filters Logic
       if (advancedFilters.departments.length > 0 && !advancedFilters.departments.includes(c.department)) return false;
       if (advancedFilters.risks.length > 0 && !advancedFilters.risks.includes(c.risk)) return false;
@@ -87,7 +120,7 @@ export default function Dashboard() {
   const visibleCases = priorityCases.slice(0, 2);
 
   const filteredActionPlans = useMemo(() => {
-    return approvedActionPlans.filter(plan => {
+    return activeActionPlans.filter(plan => {
       if (advancedFilters.departments.length > 0 && !advancedFilters.departments.includes(plan.department)) return false;
       
       if (advancedFilters.dateRange) {
@@ -111,9 +144,20 @@ export default function Dashboard() {
       <div className="space-y-6">
         <div className="flex flex-col gap-2 mb-2">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <h1 className="text-3xl font-bold tracking-tight text-slate-900">
-              {t("dashboard.title" as any)}
-            </h1>
+            <div className="flex items-center gap-3">
+              <h1 className="text-3xl font-bold tracking-tight text-slate-900">
+                {t("dashboard.title" as any)}
+              </h1>
+              <div className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-bold border ${
+                isLive ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-amber-50 text-amber-700 border-amber-200"
+              }`}>
+                {isLive ? <Wifi size={11} /> : <WifiOff size={11} />}
+                {isLoading ? "Loading..." : isLive ? "Live" : "Demo"}
+              </div>
+              <button onClick={fetchDashboard} disabled={isLoading} className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 transition text-slate-500 disabled:opacity-50">
+                <RefreshCw size={13} className={isLoading ? "animate-spin" : ""} />
+              </button>
+            </div>
             
             {/* Unified Filter Button */}
             <div className="flex items-center gap-3">
@@ -165,7 +209,7 @@ export default function Dashboard() {
           <motion.div variants={item} className="panel rounded-xl p-5 flex items-center justify-between hover:-translate-y-1 hover:shadow-lg transition-all duration-300">
             <div>
               <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">{t("dashboard.total_verified" as any)}</p>
-              <h3 className="text-2xl font-bold text-slate-900">312</h3>
+              <h3 className="text-2xl font-bold text-slate-900">{totalVerified}</h3>
             </div>
             <div className="p-3 rounded-xl bg-emerald-100 text-emerald-600">
               <CheckCircle2 size={24} />
@@ -175,7 +219,7 @@ export default function Dashboard() {
           <motion.div variants={item} className="panel rounded-xl p-5 flex items-center justify-between hover:-translate-y-1 hover:shadow-lg transition-all duration-300">
             <div>
               <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">{t("dashboard.due_today" as any)}</p>
-              <h3 className="text-2xl font-bold text-slate-900">8</h3>
+              <h3 className="text-2xl font-bold text-slate-900">{pendingCount}</h3>
             </div>
             <div className="p-3 rounded-xl bg-blue-100 text-blue-600">
               <CalendarClock size={24} />
@@ -185,7 +229,7 @@ export default function Dashboard() {
           <motion.div variants={item} className="panel rounded-xl p-5 flex items-center justify-between hover:-translate-y-1 hover:shadow-lg transition-all duration-300">
             <div>
               <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">{t("dashboard.high_risk" as any)}</p>
-              <h3 className="text-2xl font-bold text-slate-900">18</h3>
+              <h3 className="text-2xl font-bold text-slate-900">{rejectedCount}</h3>
             </div>
             <div className="p-3 rounded-xl bg-rose-100 text-rose-600">
               <AlertTriangle size={24} />
@@ -195,7 +239,7 @@ export default function Dashboard() {
           <motion.div variants={item} className="panel rounded-xl p-5 flex items-center justify-between hover:-translate-y-1 hover:shadow-lg transition-all duration-300">
             <div>
               <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">{t("dashboard.overdue" as any)}</p>
-              <h3 className="text-2xl font-bold text-slate-900">24</h3>
+              <h3 className="text-2xl font-bold text-slate-900">{totalExtracted}</h3>
             </div>
             <div className="p-3 rounded-xl bg-amber-100 text-amber-600">
               <Gavel size={24} />
@@ -281,7 +325,7 @@ export default function Dashboard() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
-                      {departmentSummary.map((dept, idx) => {
+                      {activeDepts.map((dept, idx) => {
                         const total = dept.approved + dept.review + dept.overdue;
                         const score = Math.round((dept.approved / total) * 100);
                         return (

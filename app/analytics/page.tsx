@@ -3,15 +3,25 @@
 import { departmentSummary, pipelineSteps, reviewerQueue } from "../lib/ccms-data";
 import MainLayout from "../layouts/MainLayout";
 import { motion, Variants } from "framer-motion";
-import { Activity, LayoutGrid, Users } from "lucide-react";
+import {
+  Activity,
+  LayoutGrid,
+  Users,
+  Clock,
+  CheckCircle2,
+  AlertTriangle,
+  RefreshCw,
+  Wifi,
+  WifiOff,
+  type LucideIcon,
+} from "lucide-react";
 import { useTranslation } from "../hooks/useTranslation";
+import { getAnalytics, type AnalyticsData } from "../services/api";
+import { useEffect, useState, useCallback } from "react";
 
 const container: Variants = {
   hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: { staggerChildren: 0.1 },
-  },
+  show: { opacity: 1, transition: { staggerChildren: 0.1 } },
 };
 
 const item: Variants = {
@@ -19,21 +29,119 @@ const item: Variants = {
   show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } },
 };
 
+// Map iconName strings (from backend) to Lucide components
+const iconMap: Record<string, LucideIcon> = {
+  Clock,
+  CheckCircle2,
+  AlertTriangle,
+  Activity,
+  Users,
+};
+
+// Build fallback analytics from static data
+function buildFallbackAnalytics(): AnalyticsData {
+  return {
+    pipelineSteps: pipelineSteps.map((s) => ({
+      title: s.title,
+      count: Number(s.count),
+      detail: s.detail,
+      iconName: "Activity",
+    })),
+    reviewerQueue: reviewerQueue.map((q) => ({
+      label: q.label,
+      value: Number(q.value),
+      detail: q.detail,
+      iconName: "Users",
+    })),
+    departmentSummary: departmentSummary.map((d) => ({
+      name: d.name,
+      compliance: d.approved,
+      pending: d.review,
+      overdue: d.overdue,
+    })),
+  };
+}
+
 export default function AnalyticsPage() {
   const { t } = useTranslation();
+
+  const [data, setData] = useState<AnalyticsData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isLive, setIsLive] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchData = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const result = await getAnalytics();
+      setData(result);
+      setIsLive(true);
+    } catch (err) {
+      console.warn("Analytics API unavailable, using fallback:", err);
+      setData(buildFallbackAnalytics());
+      setIsLive(false);
+      setError("Backend offline – showing demo analytics");
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  if (isLoading || !data) {
+    return (
+      <MainLayout>
+        <div className="flex items-center justify-center py-32 text-slate-400">
+          <RefreshCw size={24} className="animate-spin mr-3" />
+          <span className="text-sm font-medium">Loading analytics...</span>
+        </div>
+      </MainLayout>
+    );
+  }
+
   return (
     <MainLayout>
       <div className="space-y-6">
         <div className="flex flex-col gap-2">
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">
-            {t("analytics.title" as any)}
-          </h1>
+          <div className="flex items-center justify-between">
+            <h1 className="text-3xl font-bold tracking-tight text-slate-900">
+              {t("analytics.title" as any)}
+            </h1>
+            <div className="flex items-center gap-3">
+              <div
+                className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-bold border ${
+                  isLive
+                    ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                    : "bg-amber-50 text-amber-700 border-amber-200"
+                }`}
+              >
+                {isLive ? <Wifi size={11} /> : <WifiOff size={11} />}
+                {isLive ? "Live" : "Demo"}
+              </div>
+              <button
+                onClick={fetchData}
+                className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50 transition"
+              >
+                <RefreshCw size={13} />
+                Refresh
+              </button>
+            </div>
+          </div>
           <p className="text-sm text-slate-600">
             {t("analytics.subtitle" as any)}
           </p>
+          {error && (
+            <div className="flex items-center gap-2 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 w-fit">
+              <WifiOff size={12} />
+              {error}
+            </div>
+          )}
         </div>
 
-        <motion.div 
+        <motion.div
           variants={container}
           initial="hidden"
           animate="show"
@@ -46,10 +154,13 @@ export default function AnalyticsPage() {
               {t("analytics.pipeline" as any)}
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {pipelineSteps.map((step, idx) => {
-                const Icon = step.icon;
+              {data.pipelineSteps.map((step, idx) => {
+                const Icon = iconMap[step.iconName] ?? Activity;
                 return (
-                  <div key={idx} className="panel rounded-xl bg-white border border-slate-200 p-5 shadow-sm hover:shadow-md transition">
+                  <div
+                    key={idx}
+                    className="panel rounded-xl bg-white border border-slate-200 p-5 shadow-sm hover:shadow-md transition"
+                  >
                     <div className="flex items-start justify-between">
                       <div className="p-2 rounded-lg bg-blue-500 text-white">
                         <Icon size={20} />
@@ -72,10 +183,13 @@ export default function AnalyticsPage() {
             </div>
             <div className="panel rounded-xl bg-white border border-slate-200 overflow-hidden shadow-sm flex-1 flex flex-col">
               <div className="divide-y divide-slate-100 flex-1 flex flex-col">
-                {reviewerQueue.map((queueItem, idx) => {
-                  const Icon = queueItem.icon;
+                {data.reviewerQueue.map((queueItem, idx) => {
+                  const Icon = iconMap[queueItem.iconName] ?? Users;
                   return (
-                    <div key={idx} className="p-4 flex items-center justify-between hover:bg-slate-50 transition flex-1">
+                    <div
+                      key={idx}
+                      className="p-4 flex items-center justify-between hover:bg-slate-50 transition flex-1"
+                    >
                       <div className="flex items-center gap-4">
                         <div className="p-2 rounded-full bg-slate-100 text-slate-600">
                           <Icon size={18} />
@@ -107,21 +221,21 @@ export default function AnalyticsPage() {
                   <thead className="border-b border-slate-100 bg-slate-50/50 text-xs uppercase tracking-wider text-slate-500 font-semibold">
                     <tr>
                       <th className="px-6 py-4">Department</th>
-                      <th className="px-6 py-4">Approved Action Plans</th>
+                      <th className="px-6 py-4">Approved / Compliance</th>
                       <th className="px-6 py-4">Pending Review</th>
                       <th className="px-6 py-4">Overdue Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
-                    {departmentSummary.map((dept, idx) => (
+                    {data.departmentSummary.map((dept, idx) => (
                       <tr key={idx} className="hover:bg-slate-50 transition-colors">
                         <td className="px-6 py-4 font-bold text-slate-900">{dept.name}</td>
                         <td className="px-6 py-4">
                           <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">
-                            {dept.approved} cases
+                            {dept.compliance} cases
                           </span>
                         </td>
-                        <td className="px-6 py-4 font-semibold text-amber-600">{dept.review} items</td>
+                        <td className="px-6 py-4 font-semibold text-amber-600">{dept.pending} items</td>
                         <td className="px-6 py-4">
                           {dept.overdue > 0 ? (
                             <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold bg-rose-50 text-rose-700 border border-rose-100">
